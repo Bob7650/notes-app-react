@@ -1,0 +1,52 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.popup {
+  display: flex;
+  flex-direction: column;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  padding: 2em;
+  border-radius: 1em;
+  background-color: #373737;
+
+  > p {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 2rem;
+    color: white;
+    margin: 0.5em 0 0.5em 0;
+  }
+
+  > input {
+    font-size: 1.5rem;
+
+    color: white;
+    background-color: #373737;
+    border-color: #272727;
+    border-radius: 0.5em;
+
+    margin: 0.5em 0 0.5em 0;
+  }
+}
+
+.buttonWrapper {
+  display: flex;
+  justify-content: space-between;
+
+  margin: 0.5em 0 0.5em 0;
+
+  > button {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.5rem;
+  }
+}

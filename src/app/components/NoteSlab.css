@@ -1,0 +1,70 @@
+.slabWrapper {
+  display: flex;
+  flex-direction: column;
+
+  margin: 1.5em;
+  min-height: 20em;
+  min-width: 15em;
+  filter: drop-shadow(4px 4px 4px #1b1b1b);
+}
+
+@keyframes sizeIncrease {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.05);
+  }
+}
+
+.slabWrapper:hover {
+  animation-name: sizeIncrease;
+  animation-duration: 75ms;
+  animation-fill-mode: forwards;
+  animation-timing-function: ease-out;
+  transform-origin: center;
+}
+
+.slabTop {
+  background-color: #272727;
+
+  margin: 0;
+  border-radius: 16px 16px 0 0;
+  padding: 0 1em 0 1em;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  cursor: grab;
+
+  > p {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: large;
+    font-weight: bold;
+    color: white;
+  }
+
+  > img:hover {
+    border-radius: 100%;
+    background-color: #373737;
+    cursor: pointer;
+  }
+}
+
+.slabBot {
+  flex: 1;
+  background-color: #373737;
+
+  margin: 0;
+  border-radius: 0 0 16px 16px;
+
+  cursor: pointer;
+
+  > p {
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+
+    margin: 1em;
+  }
+}
