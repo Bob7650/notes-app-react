@@ -20,6 +20,12 @@ export default function MainPage() {
       payload: { id: "", title: title, contents: contents },
     });
   };
+  const onRemoveHandler = (id: string) => {
+    dispatch({
+      type: "REMOVE_ITEM",
+      id: id,
+    });
+  };
   const [isPopupVisible, setPopupVisible] = useState(false);
 
   return (
@@ -30,7 +36,13 @@ export default function MainPage() {
           <input type="image" src={settings} />
         </div>
         <div className="contentContainer">
-          <ReorderableList items={items} />
+          <ReorderableList
+            items={items}
+            onRemove={(id) => {
+              onRemoveHandler(id);
+            }}
+            onEdit={() => {}}
+          />
           <AddNote
             onClick={() => {
               setPopupVisible(true);
@@ -60,7 +72,7 @@ const itemsReducer: Reducer<NoteElement[], ItemsAction> = (items, action) => {
       return [...items, action.payload];
     }
     case "REMOVE_ITEM": {
-      return items.splice(action.index, 1);
+      return items.filter((item) => item.id !== action.id);
     }
     default: {
       return items;

@@ -10,11 +10,14 @@ import { useState } from "react";
 
 interface Props {
   items: NoteElement[];
+  onRemove: (id: string) => void;
+  onEdit: () => void;
 }
 
-export default function ReorderableList({ items }: Props) {
+export default function ReorderableList({ items, onRemove, onEdit }: Props) {
   const [popupAnchor, setPopupAnchor] = useState<HTMLImageElement>();
   const [isVisible, setVisible] = useState<boolean>(false);
+  const [callerId, setCallerId] = useState<string>("");
 
   return (
     <>
@@ -25,7 +28,8 @@ export default function ReorderableList({ items }: Props) {
               id={item.id}
               title={item.title}
               content={item.contents}
-              onMoreClicked={(anchor) => {
+              onMoreClicked={(anchor, callerId) => {
+                setCallerId(callerId);
                 setPopupAnchor(anchor);
                 setVisible(true);
               }}
@@ -46,8 +50,17 @@ export default function ReorderableList({ items }: Props) {
               itemName="Delete"
               imgSrc={deleteIcon}
               imgAlt="Delete"
+              onClick={() => {
+                console.log("item clicked");
+                onRemove(callerId);
+              }}
             />
-            <MorePopupItem itemName="Edit" imgSrc={deleteIcon} imgAlt="Edit" />
+            <MorePopupItem
+              itemName="Edit"
+              imgSrc={deleteIcon}
+              imgAlt="Edit"
+              onClick={onEdit}
+            />
           </>
         </MorePopup>
       </ModalPopup>

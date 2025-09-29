@@ -7,7 +7,7 @@ interface Props {
   title: string;
   content: string;
   onNoteClicked: () => void;
-  onMoreClicked: (anchor: HTMLImageElement) => void;
+  onMoreClicked: (anchor: HTMLImageElement, callerId: string) => void;
 }
 
 export default function NoteSlab({
@@ -29,7 +29,8 @@ export default function NoteSlab({
             src={more}
             alt="More"
             onClick={() => {
-              if (moreButtonRef.current) onMoreClicked(moreButtonRef.current);
+              if (moreButtonRef.current)
+                onMoreClicked(moreButtonRef.current, id);
             }}
           />
         </div>
