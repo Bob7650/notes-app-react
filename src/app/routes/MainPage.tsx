@@ -9,19 +9,17 @@ import type { ItemsAction } from "../types/ItemsAciton";
 import ModalPopup from "../components/popups/ModalPopup";
 import AddPopup from "../components/popups/AddPopup";
 
-function MainPage() {
+export default function MainPage() {
   const [items, dispatch] = useReducer(
     itemsReducer,
-    [{ title: "Title", contents: "Blah blah blah" }] //Initial state
+    [{ id: "predefined", title: "Title", contents: "Blah blah blah" }] //Initial state
   );
-
   const onAddHandler = (title: string, contents: string) => {
     dispatch({
       type: "ADD_ITEM",
-      payload: { title: title, contents: contents },
+      payload: { id: "", title: title, contents: contents },
     });
   };
-
   const [isPopupVisible, setPopupVisible] = useState(false);
 
   return (
@@ -56,6 +54,9 @@ function MainPage() {
 const itemsReducer: Reducer<NoteElement[], ItemsAction> = (items, action) => {
   switch (action.type) {
     case "ADD_ITEM": {
+      if (action.payload.id === "") {
+        action.payload.id = Math.random().toString(16).slice(2);
+      }
       return [...items, action.payload];
     }
     case "REMOVE_ITEM": {
@@ -66,5 +67,3 @@ const itemsReducer: Reducer<NoteElement[], ItemsAction> = (items, action) => {
     }
   }
 };
-
-export default MainPage;

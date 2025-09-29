@@ -1,25 +1,37 @@
 import "./NoteSlab.css";
 import more from "../../assets/more_vert_24dp.svg";
+import { useRef } from "react";
 
 interface Props {
+  id: string;
   title: string;
   content: string;
   onNoteClicked: () => void;
-  onMoreClicked: () => void;
+  onMoreClicked: (anchor: HTMLImageElement) => void;
 }
 
 export default function NoteSlab({
+  id,
   title,
   content,
   onNoteClicked,
   onMoreClicked,
 }: Props) {
+  const moreButtonRef = useRef<HTMLImageElement>(null);
+
   return (
     <>
-      <div className="slabWrapper">
+      <div id={id.toString()} className="slabWrapper">
         <div className="slabTop">
           <p>{title}</p>
-          <img src={more} alt="More" onClick={onMoreClicked} />
+          <img
+            ref={moreButtonRef}
+            src={more}
+            alt="More"
+            onClick={() => {
+              if (moreButtonRef.current) onMoreClicked(moreButtonRef.current);
+            }}
+          />
         </div>
 
         <div className="slabBot" onClick={onNoteClicked}>
