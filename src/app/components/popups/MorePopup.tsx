@@ -66,10 +66,8 @@ function calculatePosition(
 } {
   if (!anchorRect || !popupRect) return { left: 0, top: 0 };
 
-  const padding = 5;
-
   return {
     left: anchorRect!!.left,
-    top: anchorRect!!.top + popupRect.height / 2 + padding,
+    top: anchorRect!!.top + popupRect.height / 2,
   };
 }

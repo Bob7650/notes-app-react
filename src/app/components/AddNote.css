@@ -1,12 +1,12 @@
 .addWrapper{
     display: flex;
     
-    margin: 1.5em;
+    margin: .5em;
     min-height: 20em;
     min-width: 15em;
 
     border-radius: 16px;
-    border: dashed white;
+    border: 2px dashed white;
 
     justify-content: center;
     cursor: pointer;

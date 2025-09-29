@@ -7,5 +7,6 @@ ul {
 
 li {
   margin: 0;
+  padding: .5em;
   list-style: none;
 }

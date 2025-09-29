@@ -41,7 +41,14 @@ export default function ReorderableList({ items }: Props) {
             setVisible(false);
           }}
         >
-          <MorePopupItem itemName="Delete" imgSrc={deleteIcon} imgAlt="Del" />
+          <>
+            <MorePopupItem
+              itemName="Delete"
+              imgSrc={deleteIcon}
+              imgAlt="Delete"
+            />
+            <MorePopupItem itemName="Edit" imgSrc={deleteIcon} imgAlt="Edit" />
+          </>
         </MorePopup>
       </ModalPopup>
     </>
