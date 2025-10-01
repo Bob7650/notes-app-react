@@ -5,6 +5,7 @@ import type { NoteElement } from "../types/NoteElement";
 import type { ItemsAction } from "../types/ItemsAciton";
 import TopBar from "../components/TopBar";
 import NoteSelectorDrawer from "../components/NoteSelectorDrawer";
+import NoteEditor from "../components/NoteEditor";
 
 export default function MainPage() {
   const [items, dispatch] = useReducer(
@@ -23,17 +24,18 @@ export default function MainPage() {
       id: id,
     });
   };
-  const [isPopupVisible, setPopupVisible] = useState(false);
 
   return (
     <>
       <TopBar />
 
-      <div className="contentContainer">
+      <div className="content-container">
         <div className="note-drawer-section">
           <NoteSelectorDrawer />
         </div>
-        <div className="noteEditor"></div>
+        <div className="note-editor-section">
+          <NoteEditor />
+        </div>
       </div>
     </>
   );
