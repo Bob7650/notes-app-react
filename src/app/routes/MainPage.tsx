@@ -1,13 +1,10 @@
 import "./MainPage.css";
 
-import settings from "../../assets/settings_24dp.svg";
-import ReorderableList from "../components/ReorderableList";
-import AddNote from "../components/AddNote";
 import { useReducer, useState, type Reducer } from "react";
 import type { NoteElement } from "../types/NoteElement";
 import type { ItemsAction } from "../types/ItemsAciton";
-import ModalPopup from "../components/popups/ModalPopup";
-import AddPopup from "../components/popups/AddPopup";
+import TopBar from "../components/TopBar";
+import NoteSelectorDrawer from "../components/NoteSelectorDrawer";
 
 export default function MainPage() {
   const [items, dispatch] = useReducer(
@@ -30,39 +27,18 @@ export default function MainPage() {
 
   return (
     <>
-      <div className="mainPageContainer">
-        <div className="topbar">
-          <p>Notes</p>
-          <input type="image" src={settings} />
+      <TopBar />
+
+      <div className="contentContainer">
+        <div className="note-drawer-section">
+          <NoteSelectorDrawer />
         </div>
-        <div className="contentContainer">
-          <ReorderableList
-            items={items}
-            onRemove={(id) => {
-              onRemoveHandler(id);
-            }}
-            onEdit={() => {}}
-          />
-          <AddNote
-            onClick={() => {
-              setPopupVisible(true);
-            }}
-          />
-        </div>
-        <ModalPopup isVisible={isPopupVisible}>
-          <AddPopup
-            onDismiss={() => setPopupVisible(false)}
-            onSave={(title: string) =>
-              onAddHandler(title, "Put your notes here!")
-            }
-          />
-        </ModalPopup>
+        <div className="noteEditor"></div>
       </div>
     </>
   );
 }
 
-// Items is passed autamaticaly, action we pass ourselves
 const itemsReducer: Reducer<NoteElement[], ItemsAction> = (items, action) => {
   switch (action.type) {
     case "ADD_ITEM": {

@@ -1,0 +1,33 @@
+.selector-border {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  margin: 0.5em 1em 0.5em 1em;
+
+  > p,
+  > span {
+    font-size: 1.3em;
+    padding: 0.3em 0.5em 0.3em 0.5em;
+  }
+
+  > span {
+    visibility: hidden;
+  }
+}
+
+.selector-border:hover,
+.selector-selected {
+  background-color: var(--primary-light);
+
+  > p {
+    font-weight: bold;
+  }
+
+  > span {
+    visibility: visible;
+  }
+}
