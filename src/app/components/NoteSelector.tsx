@@ -5,14 +5,22 @@ import { useClickOutside } from "../../hooks/useClickOutside";
 interface Props {
   title: string;
   editable: boolean;
-  onClick: () => void;
+  isSelected: boolean;
+  onMoreClick: (element: HTMLSpanElement | null) => void;
+  onBodyClick: () => void;
 }
 
-export default function NoteSelector({ title, editable, onClick }: Props) {
+export default function NoteSelector({
+  title,
+  editable,
+  isSelected,
+  onMoreClick,
+  onBodyClick,
+}: Props) {
   const [value, setValue] = useState(title);
   const [disabled, setDisabled] = useState(!editable);
   const wrapperRef = useRef<HTMLDivElement>(null);
-
+  const moreButtRef = useRef<HTMLSpanElement>(null);
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       setDisabled(true);
@@ -27,7 +35,13 @@ export default function NoteSelector({ title, editable, onClick }: Props) {
 
   return (
     <>
-      <div className="selector-border" ref={wrapperRef}>
+      <div
+        className={
+          isSelected ? "selector-border selector-selected" : "selector-border"
+        }
+        ref={wrapperRef}
+        onClick={onBodyClick}
+      >
         <div>
           <input
             readOnly={disabled}
@@ -38,7 +52,11 @@ export default function NoteSelector({ title, editable, onClick }: Props) {
             onKeyDown={handleKeyDown}
           />
         </div>
-        <span className="material-symbols-outlined" onClick={onClick}>
+        <span
+          className="material-symbols-outlined"
+          onClick={() => onMoreClick(moreButtRef.current)}
+          ref={moreButtRef}
+        >
           more_vert
         </span>
       </div>

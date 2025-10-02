@@ -30,6 +30,8 @@ export default function MainPage() {
     });
   };
 
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+
   return (
     <>
       <TopBar />
@@ -38,13 +40,25 @@ export default function MainPage() {
         <div className="note-drawer-section">
           <NoteSelectorDrawer
             items={items}
+            selectedIndex={selectedIndex}
             onHideSideDrawer={() => {}}
             onAddClick={onAddHandler}
-            onSelectionChanged={() => {}}
+            onSelectionChanged={(index) => {
+              setSelectedIndex(index);
+            }}
+            onDelete={(callerInd: number) => {
+              if (callerInd <= selectedIndex) {
+                setSelectedIndex(selectedIndex - 1);
+              }
+              onRemoveHandler(items[callerInd].id);
+            }}
+            onRename={(callerInd: number) => {}}
           />
         </div>
         <div className="note-editor-section">
-          <NoteEditor />
+          {selectedIndex < 0 ? null : ( //TODO: replace with some nicer screen
+            <NoteEditor noteElement={items[selectedIndex]} />
+          )}
         </div>
       </div>
     </>

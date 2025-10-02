@@ -1,0 +1,36 @@
+.more-popup-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+
+  cursor: pointer;
+}
+
+.mp-item-container:first-child {
+  border-radius: 16px 16px 0 0;
+}
+
+.mp-item-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background-color: var(--tertiary);
+  padding: 0.5em 0.5em 0.5em 0.5em;
+
+  > p {
+    margin: 0 1em 0 0;
+  }
+}
+
+.mp-item-container:last-child {
+  border-radius: 0 0 16px 16px;
+}
+
+.mp-item-container:hover {
+  background-color: var(--tertiary-light);
+}
