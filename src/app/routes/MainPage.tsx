@@ -10,12 +10,17 @@ import NoteEditor from "../components/NoteEditor";
 export default function MainPage() {
   const [items, dispatch] = useReducer(
     itemsReducer,
-    [{ id: "predefined", title: "Title", contents: "Blah blah blah" }] //Initial state
+    [{ id: "predefined", title: "Title", contents: "Example", editing: false }] //Initial state
   );
-  const onAddHandler = (title: string, contents: string) => {
+  const onAddHandler = () => {
     dispatch({
       type: "ADD_ITEM",
-      payload: { id: "", title: title, contents: contents },
+      payload: {
+        id: "",
+        title: "Untitled",
+        contents: "Put your notes here!",
+        editing: false,
+      },
     });
   };
   const onRemoveHandler = (id: string) => {
@@ -31,7 +36,12 @@ export default function MainPage() {
 
       <div className="content-container">
         <div className="note-drawer-section">
-          <NoteSelectorDrawer />
+          <NoteSelectorDrawer
+            items={items}
+            onHideSideDrawer={() => {}}
+            onAddClick={onAddHandler}
+            onSelectionChanged={() => {}}
+          />
         </div>
         <div className="note-editor-section">
           <NoteEditor />

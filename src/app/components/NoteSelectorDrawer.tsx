@@ -1,16 +1,30 @@
+import type { NoteElement } from "../types/NoteElement";
 import NoteSelector from "./NoteSelector";
 import "./NoteSelectorDrawer.css";
 
-export default function NoteSelectorDrawer() {
-  const idk: string[] = ["one", "two", "three", "four", "five"];
+interface Props {
+  items: NoteElement[];
+  onHideSideDrawer: () => void;
+  onAddClick: () => void;
+  onSelectionChanged: () => void;
+}
 
+export default function NoteSelectorDrawer({
+  items,
+  onHideSideDrawer,
+  onAddClick,
+  onSelectionChanged,
+}: Props) {
   return (
     <>
       <div className="note-drawer-wrapper">
         <div className="note-drawer-content">
           <div className="top-section">
             <p>Your Notes</p>
-            <span className="material-symbols-outlined">
+            <span
+              className="material-symbols-outlined"
+              onClick={onHideSideDrawer}
+            >
               arrow_back_ios_new
             </span>
           </div>
@@ -19,15 +33,19 @@ export default function NoteSelectorDrawer() {
           </div>
           <div className="note-selector-section">
             <ul>
-              {idk.map((item) => (
-                <li key={item}>
-                  <NoteSelector title={item} />
+              {items.map((item) => (
+                <li key={item.id}>
+                  <NoteSelector
+                    title={item.title}
+                    onClick={onSelectionChanged}
+                    editable={item.editing}
+                  />
                 </li>
               ))}
             </ul>
           </div>
           <div className="add-button-section">
-            <button>
+            <button onClick={onAddClick}>
               <p>Add new Note</p>
               <span className="material-symbols-outlined">add</span>
             </button>
