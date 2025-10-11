@@ -6,17 +6,17 @@ import MorePopup from "./popups/MorePopup";
 
 interface Props {
   items: NoteElement[];
-  selectedIndex: number;
+  selectedId: string;
   onHideSideDrawer: () => void;
   onAddClick: () => void;
-  onSelectionChanged: (index: number) => void;
-  onDelete: (index: number) => void;
+  onSelectionChanged: (id: string) => void;
+  onDelete: (index: number, id: string) => void;
   onRename: (id: number) => void;
 }
 
 export default function NoteSelectorDrawer({
   items,
-  selectedIndex,
+  selectedId,
   onHideSideDrawer,
   onAddClick,
   onSelectionChanged,
@@ -49,8 +49,8 @@ export default function NoteSelectorDrawer({
                 <li key={item.id}>
                   <NoteSelector
                     title={item.title}
-                    isSelected={selectedIndex === index}
-                    onBodyClick={() => onSelectionChanged(index)}
+                    isSelected={item.id === selectedId}
+                    onBodyClick={() => onSelectionChanged(item.id)}
                     onMoreClick={(a) => {
                       setPopupCaller(index);
                       setAnchor(a);
@@ -78,7 +78,7 @@ export default function NoteSelectorDrawer({
           onRename(popupCaller);
         }}
         onDelete={() => {
-          onDelete(popupCaller);
+          onDelete(popupCaller, items[popupCaller].id);
         }}
         onDismiss={() => {
           setVisible(false);
