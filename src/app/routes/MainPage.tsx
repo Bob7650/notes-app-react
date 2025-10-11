@@ -19,27 +19,12 @@ export default function MainPage() {
 
       <div className="content-container">
         <div className="note-drawer-section">
-          <NoteSelectorDrawer
-            items={items.getItems()}
-            selectedId={items.getSelected().id}
-            onHideSideDrawer={() => {}}
-            onAddClick={() => items.add()}
-            onSelectionChanged={(id) => {
-              items.select(id);
-            }}
-            onDelete={(callerInd: number, callerId: string) => {
-              if (callerInd <= selectedIndex) {
-                setSelectedIndex(selectedIndex - 1);
-              }
-              items.remove(callerId);
-            }}
-            onRename={(callerId: number) => {}}
-          />
+          <NoteSelectorDrawer data={items} onHideSideDrawer={() => {}} />
         </div>
         <div className="note-editor-section">
-          {selectedIndex < 0 ? null : ( //TODO: replace with some nicer screen
-            <NoteEditor noteElement={items.getSelected()} />
-          )}
+          {items.getSelectedItem() ? (
+            <NoteEditor noteElement={items.getSelectedItem()!!} />
+          ) : null}
         </div>
       </div>
     </>

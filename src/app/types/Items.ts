@@ -5,27 +5,41 @@ import type { ItemsAction } from "./ItemsAciton";
 export default class Items {
   items: NoteElement[];
   dispatch: ActionDispatch<[ItemsAction]>;
-  selected: NoteElement;
-  setSelected: Function;
+  selectedId: string;
+  setSelectedId: Function;
 
   constructor(initialState: NoteElement[] = [], selectedInd: number) {
-    [this.items, this.dispatch] = useReducer(itemsReducer, initialState);
-    [this.selected, this.setSelected] = useState(this.items[selectedInd]);
+    [this.items, this.dispatch] = useReducer(this.itemsReducer, initialState);
+    [this.selectedId, this.setSelectedId] = useState(
+      this.items[selectedInd].id
+    );
   }
 
   add() {
+    const newId = Math.random().toString(16).slice(2);
+
     this.dispatch({
       type: "ADD_ITEM",
       payload: {
-        id: "",
+        id: newId,
         title: "Untitled",
         contents: "Put your notes here!",
         editing: false,
       },
     });
+    this.selectId(newId);
   }
 
   remove(id: string) {
+    const callerInd: number = this.items.findIndex((item) => item.id === id);
+    const selectedIndex: number = this.items.findIndex(
+      (item) => item.id === this.selectedId
+    );
+
+    if (callerInd <= selectedIndex) {
+      this.setSelectedId(this.items[selectedIndex - 1]);
+    }
+
     this.dispatch({
       type: "REMOVE_ITEM",
       id: id,
@@ -34,34 +48,36 @@ export default class Items {
 
   rename() {}
 
-  select(id: string){
-    const temp = this.items.find((item)=>item.id===id);
-    if(temp)
-      this.setSelected(temp);
+  selectId(id: string) {
+    this.setSelectedId(id);
   }
 
-  getSelected(): NoteElement {
-    return this.selected;
+  getSelectedId(): string {
+    return this.selectedId;
+  }
+
+  getSelectedItem(): NoteElement | undefined {
+    return this.items.find((item) => item.id === this.getSelectedId());
   }
 
   getItems(): NoteElement[] {
     return this.items;
   }
-}
 
-const itemsReducer: Reducer<NoteElement[], ItemsAction> = (items, action) => {
-  switch (action.type) {
-    case "ADD_ITEM": {
-      if (action.payload.id === "") {
-        action.payload.id = Math.random().toString(16).slice(2);
+  private itemsReducer: Reducer<NoteElement[], ItemsAction> = (
+    items,
+    action
+  ) => {
+    switch (action.type) {
+      case "ADD_ITEM": {
+        return [...items, action.payload];
       }
-      return [...items, action.payload];
+      case "REMOVE_ITEM": {
+        return items.filter((item) => item.id !== action.id);
+      }
+      default: {
+        return items;
+      }
     }
-    case "REMOVE_ITEM": {
-      return items.filter((item) => item.id !== action.id);
-    }
-    default: {
-      return items;
-    }
-  }
-};
+  };
+}

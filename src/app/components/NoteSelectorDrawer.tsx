@@ -1,29 +1,16 @@
 import { useState } from "react";
-import type { NoteElement } from "../types/NoteElement";
 import NoteSelector from "./NoteSelector";
 import "./NoteSelectorDrawer.css";
 import MorePopup from "./popups/MorePopup";
+import type Items from "../types/Items";
 
 interface Props {
-  items: NoteElement[];
-  selectedId: string;
+  data: Items;
   onHideSideDrawer: () => void;
-  onAddClick: () => void;
-  onSelectionChanged: (id: string) => void;
-  onDelete: (index: number, id: string) => void;
-  onRename: (id: number) => void;
 }
 
-export default function NoteSelectorDrawer({
-  items,
-  selectedId,
-  onHideSideDrawer,
-  onAddClick,
-  onSelectionChanged,
-  onRename,
-  onDelete,
-}: Props) {
-  const [popupCaller, setPopupCaller] = useState(-1);
+export default function NoteSelectorDrawer({ data, onHideSideDrawer }: Props) {
+  const [popupCaller, setPopupCaller] = useState<string>("");
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const [isVisible, setVisible] = useState(false);
 
@@ -45,14 +32,14 @@ export default function NoteSelectorDrawer({
           </div>
           <div className="note-selector-section">
             <ul>
-              {items.map((item, index) => (
+              {data.getItems().map((item) => (
                 <li key={item.id}>
                   <NoteSelector
                     title={item.title}
-                    isSelected={item.id === selectedId}
-                    onBodyClick={() => onSelectionChanged(item.id)}
+                    isSelected={item.id === data.getSelectedId()}
+                    onBodyClick={() => data.selectId(item.id)}
                     onMoreClick={(a) => {
-                      setPopupCaller(index);
+                      setPopupCaller(item.id);
                       setAnchor(a);
                       setVisible(true);
                     }}
@@ -63,7 +50,7 @@ export default function NoteSelectorDrawer({
             </ul>
           </div>
           <div className="add-button-section">
-            <button onClick={onAddClick}>
+            <button onClick={() => data.add()}>
               <p>Add new Note</p>
               <span className="material-symbols-outlined">add</span>
             </button>
@@ -75,10 +62,10 @@ export default function NoteSelectorDrawer({
         isVisible={isVisible}
         anchor={anchor}
         onRename={() => {
-          onRename(popupCaller);
+          data.rename();
         }}
         onDelete={() => {
-          onDelete(popupCaller, items[popupCaller].id);
+          data.remove(popupCaller);
         }}
         onDismiss={() => {
           setVisible(false);
