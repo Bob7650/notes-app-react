@@ -1,11 +1,33 @@
+import { useState } from "react";
 import IconButton from "../../shared/components/IconButton";
 import NoteCard from "../../shared/components/NoteCard";
-import NoteFolder from "../../shared/components/NoteFolder";
 import NoteSelector from "../../shared/components/NoteSelector";
 import TextEditor from "../../shared/components/TextEditor";
 import "./MainPage.style.css";
+import type { NoteObject } from "../../shared/types/NoteObject";
 
 export default function MainPage() {
+    const [notes, setNotes] = useState<NoteObject[]>([
+        {
+            id: 1,
+            title: "Example Note",
+            content: "",
+            depth: 0,
+        },
+    ]);
+
+    const handleAdd = () => {
+        setNotes([
+            ...notes,
+            {
+                id: 1,
+                title: "Example Note",
+                content: "",
+                depth: 0,
+            },
+        ]);
+    };
+
     return (
         <div className="app-container">
             <aside className="drawer-section">
@@ -16,17 +38,37 @@ export default function MainPage() {
                 </div>
                 <div className="drawer-contents bordered">
                     <div className="top-icons-section">
-                        <IconButton iconName="edit_square" />
+                        <IconButton
+                            iconName="edit_square"
+                            onClick={handleAdd}
+                        />
                         <IconButton iconName="create_new_folder" />
                         <IconButton iconName="sort_by_alpha" />
                     </div>
                     <ul className="folders-section">
-                        <li>
-                            <NoteFolder />
-                        </li>
-                        <li>
-                            <NoteSelector depth={0} />
-                        </li>
+                        {notes.map((singleNote) => (
+                            <li key={singleNote.id}>
+                                <NoteSelector
+                                    data={singleNote}
+                                    onRename={(
+                                        id: number,
+                                        newTitle: string
+                                    ) => {
+                                        const newArray: NoteObject[] =
+                                            notes.map((item: NoteObject) =>
+                                                item.id == id
+                                                    ? {
+                                                          ...item,
+                                                          title: newTitle,
+                                                      }
+                                                    : item
+                                            );
+                                        console.log(newTitle);
+                                        setNotes(newArray);
+                                    }}
+                                />
+                            </li>
+                        ))}
                     </ul>
                 </div>
             </aside>

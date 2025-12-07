@@ -6,6 +6,8 @@
     padding-block: 4px;
     gap: 4px;
 
+    cursor: pointer;
+
     border-radius: var(--round-rad-default);
 
     &:hover {
@@ -17,4 +19,22 @@
     width: 24px;
     text-align: center;
     color: var(--icon-secondary);
+}
+
+.editable-input {
+    width: 100%;
+
+    padding-inline: 0;
+    padding-block: 2px;
+
+    font-size: 1rem;
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+    outline: none;
+    border: none;
+    background-color: transparent;
+}
+
+.editable-label {
+    width: 100%;
 }
