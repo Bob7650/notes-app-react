@@ -1,0 +1,14 @@
+.icon-button {
+    display: flex;
+    align-items: center;
+
+    padding: 2px;
+
+    border: none;
+    border-radius: var(--round-rad-default);
+    background-color: transparent;
+
+    &:hover {
+        background-color: var(--bg-default-hover);
+    }
+}

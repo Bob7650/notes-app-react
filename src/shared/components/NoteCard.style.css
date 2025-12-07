@@ -1,0 +1,27 @@
+.card-wrapper {
+    width: 220px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding-inline: 16px 4px;
+    padding-block: 4px;
+
+    border-top-left-radius: var(--round-rad-default);
+    border-top-right-radius: var(--round-rad-default);
+
+    outline-offset: -1px;
+
+    &:hover {
+        background-color: var(--bg-default-hover);
+    }
+}
+
+.card-title {
+    font-weight: 600;
+}
+
+.card-selected {
+    outline: 2px solid var(--border-default);
+}

@@ -1,0 +1,20 @@
+.note-selector-wrapper {
+    display: flex;
+    align-items: center;
+
+    padding-inline: 8px;
+    padding-block: 4px;
+    gap: 4px;
+
+    border-radius: var(--round-rad-default);
+
+    &:hover {
+        background-color: var(--bg-default-hover);
+    }
+}
+
+.indent-bar {
+    width: 24px;
+    text-align: center;
+    color: var(--icon-secondary);
+}
