@@ -8,7 +8,13 @@
     border-radius: var(--round-rad-default);
     background-color: transparent;
 
+    cursor: pointer;
+
     &:hover {
         background-color: var(--bg-default-hover);
+    }
+
+    > span:hover {
+        color: var(--icon-secondary-hover);
     }
 }

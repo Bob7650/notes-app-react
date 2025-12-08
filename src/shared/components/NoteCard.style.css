@@ -13,6 +13,8 @@
 
     outline-offset: -1px;
 
+    cursor: pointer;
+
     &:hover {
         background-color: var(--bg-default-hover);
     }

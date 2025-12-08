@@ -7,7 +7,15 @@ interface Props {
 
 export default function IconButton({ iconName, onClick }: Props) {
     return (
-        <button className="icon-button" onClick={onClick}>
+        <button
+            className="icon-button"
+            onClick={(e) => {
+                if (onClick) {
+                    e.stopPropagation();
+                    onClick();
+                }
+            }}
+        >
             <span className="material-symbols-outlined">{iconName}</span>
         </button>
     );

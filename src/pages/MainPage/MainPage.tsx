@@ -7,6 +7,8 @@ import "./MainPage.style.css";
 import type { NoteObject } from "../../shared/types/NoteObject";
 
 export default function MainPage() {
+    const [selectedCardId, setSelectedTabId] = useState<number | null>(null);
+    const [openedCards, setOpenedTabs] = useState<number[]>([]);
     const [notes, setNotes] = useState<NoteObject[]>([
         {
             id: 1,
@@ -26,12 +28,24 @@ export default function MainPage() {
         setNotes([
             ...notes,
             {
-                id: 1,
+                id: 3,
                 title: "New Example Note",
                 content: "This is a content of a New Example Note",
                 depth: 0,
             },
         ]);
+    };
+
+    const handleNewTab = (noteId: number) => {
+        setOpenedTabs((tabs) =>
+            tabs.includes(noteId) ? tabs : [...tabs, noteId]
+        );
+        setSelectedTabId(noteId);
+    };
+
+    const handleCloseTab = (tabId: number) => {
+        setOpenedTabs(openedCards.filter((tab) => tab !== tabId));
+        setSelectedTabId(openedCards.length - 1);
     };
 
     return (
@@ -56,6 +70,10 @@ export default function MainPage() {
                             <li key={singleNote.id}>
                                 <NoteSelector
                                     data={singleNote}
+                                    isSelected={
+                                        selectedCardId === singleNote.id
+                                    }
+                                    onClick={() => handleNewTab(singleNote.id)}
                                     onRename={(
                                         id: number,
                                         newTitle: string
@@ -80,9 +98,27 @@ export default function MainPage() {
             </aside>
             <div className="main-panel-section">
                 <div className="main-top-bar bordered">
-                    <NoteCard isSelected={true} />
-                    <NoteCard />
-                    <NoteCard />
+                    <ul className="cards-section">
+                        {openedCards.map((card) => (
+                            <li key={card}>
+                                <NoteCard
+                                    title={
+                                        notes.find((note) => note.id === card)
+                                            ?.title
+                                            ? notes.find(
+                                                  (note) => note.id === card
+                                              )?.title!!
+                                            : ""
+                                    }
+                                    isSelected={selectedCardId === card}
+                                    onClick={() => {
+                                        setSelectedTabId(card);
+                                    }}
+                                    onClose={() => handleCloseTab(card)}
+                                />
+                            </li>
+                        ))}
+                    </ul>
                 </div>
                 <div className="note-tools-section bordered">
                     <div className="tools-section">
@@ -94,7 +130,13 @@ export default function MainPage() {
                     </div>
                     <div className="note-section">
                         <div className="editor-wrapper">
-                            <TextEditor value={""} />
+                            <TextEditor
+                                value={
+                                    notes.find(
+                                        (note) => note.id === selectedCardId
+                                    )?.content
+                                }
+                            />
                         </div>
                     </div>
                 </div>
