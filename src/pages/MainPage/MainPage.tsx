@@ -153,6 +153,10 @@ export default function MainPage() {
                                         (note) => note.id === selectedCardId
                                     )?.content
                                 }
+                                onChange={(nv) => console.log("Normal: " + nv)}
+                                onChangeDebounce={(nv) =>
+                                    console.log("Debounce: " + nv)
+                                }
                             />
                         </div>
                     </div>
