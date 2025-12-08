@@ -6,7 +6,7 @@
 }
 
 .drawer-section {
-    width: 300px;
+    min-width: 300px;
 
     display: flex;
     flex-direction: column;
@@ -24,12 +24,25 @@
 
 .main-top-bar {
     height: 40px;
+    max-width: calc(100svw - 300px);
 
     display: flex;
     align-items: center;
 
     padding-inline: 16px;
     gap: 8px;
+
+    overflow-x: hidden;
+
+    scrollbar-width: none;
+
+    @supports (-moz-appearance: none) {
+        scroll-behavior: smooth;
+    }
+
+    &:hover {
+        overflow-x: scroll;
+    }
 }
 
 .drawer-contents {
@@ -68,6 +81,7 @@
     align-items: end;
 
     padding: 0;
+    gap: 8px;
 
     > li {
         list-style: none;
@@ -108,6 +122,11 @@
     max-height: calc(100svh - 85px);
 
     overflow-y: scroll;
+
+    ::-webkit-scrollbar-thumb {
+        background: red;
+    }
+    --scrollbar-width: none;
 }
 
 .editor-wrapper {

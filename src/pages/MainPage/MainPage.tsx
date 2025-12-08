@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import IconButton from "../../shared/components/IconButton";
 import NoteCard from "../../shared/components/NoteCard";
 import NoteSelector from "../../shared/components/NoteSelector";
@@ -28,7 +28,7 @@ export default function MainPage() {
         setNotes([
             ...notes,
             {
-                id: 3,
+                id: Date.now(),
                 title: "New Example Note",
                 content: "This is a content of a New Example Note",
                 depth: 0,
@@ -47,6 +47,9 @@ export default function MainPage() {
         setOpenedTabs(openedCards.filter((tab) => tab !== tabId));
         setSelectedTabId(openedCards.length - 1);
     };
+
+    //For scrolling
+    const mainTopBarRef = useRef<HTMLDivElement>(null);
 
     return (
         <div className="app-container">
@@ -97,7 +100,21 @@ export default function MainPage() {
                 </div>
             </aside>
             <div className="main-panel-section">
-                <div className="main-top-bar bordered">
+                <div
+                    className="main-top-bar bordered"
+                    onWheel={(e) => {
+                        if (!mainTopBarRef.current) return;
+
+                        if (
+                            mainTopBarRef.current.scrollWidth >
+                            mainTopBarRef.current.clientWidth
+                        ) {
+                            e.preventDefault();
+                            mainTopBarRef.current.scrollLeft += e.deltaY;
+                        }
+                    }}
+                    ref={mainTopBarRef}
+                >
                     <ul className="cards-section">
                         {openedCards.map((card) => (
                             <li key={card}>
