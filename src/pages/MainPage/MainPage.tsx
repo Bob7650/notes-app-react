@@ -11,7 +11,13 @@ export default function MainPage() {
         {
             id: 1,
             title: "Example Note",
-            content: "",
+            content: "This is a content of an Example Note",
+            depth: 0,
+        },
+        {
+            id: 2,
+            title: "Example Note2",
+            content: "This is a content of an Example Note 2",
             depth: 0,
         },
     ]);
@@ -21,8 +27,8 @@ export default function MainPage() {
             ...notes,
             {
                 id: 1,
-                title: "Example Note",
-                content: "",
+                title: "New Example Note",
+                content: "This is a content of a New Example Note",
                 depth: 0,
             },
         ]);
@@ -88,7 +94,7 @@ export default function MainPage() {
                     </div>
                     <div className="note-section">
                         <div className="editor-wrapper">
-                            <TextEditor />
+                            <TextEditor value={""} />
                         </div>
                     </div>
                 </div>

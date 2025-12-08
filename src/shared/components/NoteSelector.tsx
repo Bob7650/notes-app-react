@@ -6,14 +6,14 @@ import type { NoteObject } from "../types/NoteObject";
 interface Props {
     data: NoteObject;
     onRename: (id: number, newName: string) => void;
+    onClick?: () => void;
     isSelected?: boolean;
-    isActive?: boolean;
 }
 
 export default function NoteSelector({
     data,
     onRename,
-    isActive,
+    onClick,
     isSelected,
 }: Props) {
     const [inputValue, setInputValue] = useState<string>(data.title);
@@ -52,7 +52,9 @@ export default function NoteSelector({
 
     return (
         <div
-            className={`note-selector-wrapper${isActive ? " note-active" : ""}${
+            tabIndex={0}
+            onClick={onClick}
+            className={`note-selector-wrapper${
                 isSelected ? " note-selected" : ""
             }`}
         >

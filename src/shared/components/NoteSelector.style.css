@@ -10,9 +10,16 @@
 
     border-radius: var(--round-rad-default);
 
-    &:hover {
+    &:hover,
+    &.note-selected {
         background-color: var(--bg-default-hover);
     }
+}
+
+.note-selector-wrapper:focus-within {
+    background-color: var(--bg-default-hover);
+    outline: 2px solid var(--border-default);
+    outline-offset: -2px;
 }
 
 .indent-bar {
