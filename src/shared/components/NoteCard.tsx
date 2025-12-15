@@ -17,7 +17,13 @@ export default function NoteCard({
     return (
         <div
             className={`card-wrapper${isSelected ? " card-selected" : ""}`}
-            onClick={onClick}
+            onMouseDown={(e) => {
+                if (e.button === 1) {
+                    onClose?.();
+                } else {
+                    onClick?.();
+                }
+            }}
         >
             <span className="card-title">{title}</span>
             <IconButton iconName="close" onClick={onClose} />

@@ -7,7 +7,7 @@ import "./MainPage.style.css";
 import type { NoteObject } from "../../shared/types/NoteObject";
 
 export default function MainPage() {
-    const [selectedCardId, setSelectedTabId] = useState<number | null>(null);
+    const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
     const [openedCards, setOpenedTabs] = useState<number[]>([]);
     const [notesSnapshot, setNotesState] = useState<NoteObject[]>(() => {
         const savedNotes = localStorage.getItem("notes");
@@ -60,7 +60,7 @@ export default function MainPage() {
         setOpenedTabs((tabs) =>
             tabs.includes(tabId) ? tabs : [...tabs, tabId]
         );
-        setSelectedTabId(tabId);
+        setSelectedCardId(tabId);
         syncReact();
     };
 
@@ -70,7 +70,7 @@ export default function MainPage() {
      */
     const handleCloseTab = (cardId: number) => {
         setOpenedTabs(openedCards.filter((tab) => tab !== cardId));
-        setSelectedTabId(openedCards.length - 1);
+        if (cardId === selectedCardId) setSelectedCardId(null);
     };
 
     /**
