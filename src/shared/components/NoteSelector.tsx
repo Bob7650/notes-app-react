@@ -47,7 +47,6 @@ export default function NoteSelector({
         if (editableInputRef.current && !editableInputRef.current.hidden) {
             confirmRename();
         }
-        console.log("Clicked outside!");
     }, editableInputRef);
 
     return (

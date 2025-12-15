@@ -9,43 +9,122 @@ import type { NoteObject } from "../../shared/types/NoteObject";
 export default function MainPage() {
     const [selectedCardId, setSelectedTabId] = useState<number | null>(null);
     const [openedCards, setOpenedTabs] = useState<number[]>([]);
-    const [notes, setNotes] = useState<NoteObject[]>([
-        {
-            id: 1,
-            title: "Example Note",
-            content: "This is a content of an Example Note",
-            depth: 0,
-        },
-        {
-            id: 2,
-            title: "Example Note2",
-            content: "This is a content of an Example Note 2",
-            depth: 0,
-        },
-    ]);
+    const [notesSnapshot, setNotesState] = useState<NoteObject[]>(() => {
+        const savedNotes = localStorage.getItem("notes");
+        if (!savedNotes) localStorage.setItem("notes", "[]");
+        return savedNotes ? JSON.parse(savedNotes) : [];
+    });
 
+    /**
+     * Adds new note
+     */
     const handleAdd = () => {
-        setNotes([
-            ...notes,
-            {
-                id: Date.now(),
-                title: "New Example Note",
-                content: "This is a content of a New Example Note",
-                depth: 0,
-            },
-        ]);
+        const newNote: NoteObject = {
+            id: Date.now(),
+            title: "New Example Note",
+            content: "This is a content of a New Example Note",
+            depth: 0,
+        };
+
+        const newArray = [...notesSnapshot, newNote];
+
+        updateStorage(newArray);
+        syncReact();
     };
 
-    const handleNewTab = (noteId: number) => {
-        setOpenedTabs((tabs) =>
-            tabs.includes(noteId) ? tabs : [...tabs, noteId]
+    /**
+     * Renames a note
+     * @param id id of a note that will be renamed
+     * @param newTitle a new title that will be assigned to the note with above id
+     */
+    const handleRename = (id: number, newTitle: string) => {
+        const newArray: NoteObject[] = notesSnapshot.map((item: NoteObject) =>
+            item.id == id
+                ? {
+                      ...item,
+                      title: newTitle,
+                  }
+                : item
         );
-        setSelectedTabId(noteId);
+
+        updateStorage(newArray);
+        syncReact();
     };
 
-    const handleCloseTab = (tabId: number) => {
-        setOpenedTabs(openedCards.filter((tab) => tab !== tabId));
+    /**
+     * Changes/creates new tab
+     * @param noteId id of a note, that wants its card to be opened
+     */
+    const handleNewTab = (noteId: number) => {
+        const tabId = noteId;
+        setOpenedTabs((tabs) =>
+            tabs.includes(tabId) ? tabs : [...tabs, tabId]
+        );
+        setSelectedTabId(tabId);
+        syncReact();
+    };
+
+    /**
+     * Closes already opened card
+     * @param cardId id of a card to be closed
+     */
+    const handleCloseTab = (cardId: number) => {
+        setOpenedTabs(openedCards.filter((tab) => tab !== cardId));
         setSelectedTabId(openedCards.length - 1);
+    };
+
+    /**
+     * Function called by the DOM controlled div. Updates local storage layer with data provided.
+     * @param updatedContent new content of a note
+     * @param id id of a note, that will be changed
+     */
+    const handleUpdate = (updatedContent: string, id: number): void => {
+        if (!id) return;
+
+        const noteSpanshot = notesSnapshot.find((note) => note.id === id);
+
+        if (!noteSpanshot) {
+            console.error(`The updated note does not exist (note id: ${id})`);
+            return;
+        }
+
+        const updatedNoteSnapshot: NoteObject = {
+            ...noteSpanshot,
+            content: updatedContent,
+        };
+
+        const updatedNotesSnapshot = notesSnapshot.map((note) =>
+            note.id === updatedNoteSnapshot.id ? updatedNoteSnapshot : note
+        );
+
+        updateStorage(updatedNotesSnapshot);
+    };
+
+    /**
+     * Synchronizes react with local storage
+     */
+    const syncReact = () => {
+        //Sync React with local storage
+        const notesJson = localStorage.getItem("notes");
+
+        if (!notesJson) {
+            console.error("Could not find notes in local storage!");
+            return;
+        }
+
+        const storageNotes: NoteObject[] = JSON.parse(notesJson);
+        setNotesState(storageNotes);
+
+        console.log(`Synced React with storage.`);
+    };
+
+    /**
+     * Utility function that saves notes to the local storage
+     * @param updatedNotes NoteObject[] array that will be saved to storage
+     */
+    const updateStorage = (updatedNotes: NoteObject[]) => {
+        localStorage.setItem("notes", JSON.stringify(updatedNotes));
+        console.log("Updated storage");
     };
 
     //For scrolling
@@ -69,7 +148,7 @@ export default function MainPage() {
                         <IconButton iconName="sort_by_alpha" />
                     </div>
                     <ul className="folders-section">
-                        {notes.map((singleNote) => (
+                        {notesSnapshot.map((singleNote) => (
                             <li key={singleNote.id}>
                                 <NoteSelector
                                     data={singleNote}
@@ -77,22 +156,7 @@ export default function MainPage() {
                                         selectedCardId === singleNote.id
                                     }
                                     onClick={() => handleNewTab(singleNote.id)}
-                                    onRename={(
-                                        id: number,
-                                        newTitle: string
-                                    ) => {
-                                        const newArray: NoteObject[] =
-                                            notes.map((item: NoteObject) =>
-                                                item.id == id
-                                                    ? {
-                                                          ...item,
-                                                          title: newTitle,
-                                                      }
-                                                    : item
-                                            );
-                                        console.log(newTitle);
-                                        setNotes(newArray);
-                                    }}
+                                    onRename={handleRename}
                                 />
                             </li>
                         ))}
@@ -120,16 +184,17 @@ export default function MainPage() {
                             <li key={card}>
                                 <NoteCard
                                     title={
-                                        notes.find((note) => note.id === card)
-                                            ?.title
-                                            ? notes.find(
+                                        notesSnapshot.find(
+                                            (note) => note.id === card
+                                        )?.title
+                                            ? notesSnapshot.find(
                                                   (note) => note.id === card
                                               )?.title!!
                                             : ""
                                     }
                                     isSelected={selectedCardId === card}
                                     onClick={() => {
-                                        setSelectedTabId(card);
+                                        handleNewTab(card);
                                     }}
                                     onClose={() => handleCloseTab(card)}
                                 />
@@ -148,14 +213,18 @@ export default function MainPage() {
                     <div className="note-section">
                         <div className="editor-wrapper">
                             <TextEditor
-                                value={
-                                    notes.find(
+                                noteId={selectedCardId ? selectedCardId : -1}
+                                initialValue={
+                                    notesSnapshot.find(
                                         (note) => note.id === selectedCardId
-                                    )?.content
+                                    )?.content!!
                                 }
-                                onChange={(nv) => console.log("Normal: " + nv)}
-                                onChangeDebounce={(nv) =>
-                                    console.log("Debounce: " + nv)
+                                onChange={() => {}}
+                                onChangeDebounce={(updatedContent) =>
+                                    handleUpdate(
+                                        updatedContent,
+                                        selectedCardId!!
+                                    )
                                 }
                             />
                         </div>
