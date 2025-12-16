@@ -1,8 +1,10 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import NoteCard from "../../../shared/components/NoteCard";
 import IconButton from "../../../shared/components/IconButton";
 import TextEditor from "../../../shared/components/TextEditor";
 import type { NoteObject } from "../../../shared/types/NoteObject";
+import type { Rect } from "../../../shared/types/Rect";
+import Popover from "../../../shared/components/Popover";
 
 interface Props {
     handleUpdate: (newContents: string, noteId: number) => void;
@@ -22,9 +24,28 @@ export default function MainPagePanel({
     notesSnapshot,
 }: Props) {
     const mainTopBarRef = useRef<HTMLDivElement>(null);
+    const moreButtonRef = useRef<HTMLButtonElement>(null);
+
+    const [isPopoverOpen, setPopoverOpen] = useState(false);
+    const [anchor, setAnchor] = useState<Rect>({
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+    });
+
+    const handleDisplayPopover = (newAnchor: Rect) => {
+        setAnchor(newAnchor);
+        setPopoverOpen(true);
+    };
 
     return (
         <div className="main-panel-section">
+            <Popover
+                isOpen={isPopoverOpen}
+                anchor={anchor}
+                onClose={() => setPopoverOpen(false)}
+            />
             <div
                 className="main-top-bar bordered"
                 onWheel={(e) => {
@@ -69,7 +90,23 @@ export default function MainPagePanel({
                         <IconButton iconName="arrow_back" />
                         <IconButton iconName="arrow_forward" />
                     </div>
-                    <IconButton iconName="more_vert" />
+                    <IconButton
+                        iconName="more_vert"
+                        ref={moreButtonRef}
+                        onClick={() => {
+                            if (moreButtonRef.current) {
+                                const buttonData =
+                                    moreButtonRef.current.getBoundingClientRect();
+                                const anchor: Rect = {
+                                    x: buttonData.x,
+                                    y: buttonData.y,
+                                    width: buttonData.width,
+                                    height: buttonData.height,
+                                };
+                                handleDisplayPopover(anchor);
+                            }
+                        }}
+                    />
                 </div>
                 <div className="note-section">
                     <div className="editor-wrapper">
