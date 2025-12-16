@@ -21,8 +21,8 @@ export default function MainPage() {
     const handleAdd = () => {
         const newNote: NoteObject = {
             id: Date.now(),
-            title: "New Example Note",
-            content: "This is a content of a New Example Note",
+            title: "Untitled",
+            content: "",
             depth: 0,
         };
 
