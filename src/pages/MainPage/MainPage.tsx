@@ -1,10 +1,8 @@
-import { useRef, useState } from "react";
-import IconButton from "../../shared/components/IconButton";
-import NoteCard from "../../shared/components/NoteCard";
-import NoteSelector from "../../shared/components/NoteSelector";
-import TextEditor from "../../shared/components/TextEditor";
+import { useState } from "react";
 import "./MainPage.style.css";
 import type { NoteObject } from "../../shared/types/NoteObject";
+import MainPageDrawer from "./components/MainPageDrawer";
+import MainPagePanel from "./components/MainPagePanel";
 
 export default function MainPage() {
     const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
@@ -55,7 +53,7 @@ export default function MainPage() {
      * Changes/creates new tab
      * @param noteId id of a note, that wants its card to be opened
      */
-    const handleNewTab = (noteId: number) => {
+    const handleNewCard = (noteId: number) => {
         const tabId = noteId;
         setOpenedTabs((tabs) =>
             tabs.includes(tabId) ? tabs : [...tabs, tabId]
@@ -68,7 +66,7 @@ export default function MainPage() {
      * Closes already opened card
      * @param cardId id of a card to be closed
      */
-    const handleCloseTab = (cardId: number) => {
+    const handleCloseCard = (cardId: number) => {
         setOpenedTabs(openedCards.filter((tab) => tab !== cardId));
         if (cardId === selectedCardId) setSelectedCardId(null);
     };
@@ -127,110 +125,23 @@ export default function MainPage() {
         console.log("Updated storage");
     };
 
-    //For scrolling
-    const mainTopBarRef = useRef<HTMLDivElement>(null);
-
     return (
         <div className="app-container">
-            <aside className="drawer-section">
-                <div className="drawer-top-bar bordered">
-                    <IconButton iconName="folder" />
-                    <IconButton iconName="search" />
-                    <IconButton iconName="bookmark" />
-                </div>
-                <div className="drawer-contents bordered">
-                    <div className="top-icons-section">
-                        <IconButton
-                            iconName="edit_square"
-                            onClick={handleAdd}
-                        />
-                        <IconButton iconName="create_new_folder" />
-                        <IconButton iconName="sort_by_alpha" />
-                    </div>
-                    <ul className="folders-section">
-                        {notesSnapshot.map((singleNote) => (
-                            <li key={singleNote.id}>
-                                <NoteSelector
-                                    data={singleNote}
-                                    isSelected={
-                                        selectedCardId === singleNote.id
-                                    }
-                                    onClick={() => handleNewTab(singleNote.id)}
-                                    onRename={handleRename}
-                                />
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </aside>
-            <div className="main-panel-section">
-                <div
-                    className="main-top-bar bordered"
-                    onWheel={(e) => {
-                        if (!mainTopBarRef.current) return;
-
-                        if (
-                            mainTopBarRef.current.scrollWidth >
-                            mainTopBarRef.current.clientWidth
-                        ) {
-                            e.preventDefault();
-                            mainTopBarRef.current.scrollLeft += e.deltaY;
-                        }
-                    }}
-                    ref={mainTopBarRef}
-                >
-                    <ul className="cards-section">
-                        {openedCards.map((card) => (
-                            <li key={card}>
-                                <NoteCard
-                                    title={
-                                        notesSnapshot.find(
-                                            (note) => note.id === card
-                                        )?.title
-                                            ? notesSnapshot.find(
-                                                  (note) => note.id === card
-                                              )?.title!!
-                                            : ""
-                                    }
-                                    isSelected={selectedCardId === card}
-                                    onClick={() => {
-                                        handleNewTab(card);
-                                    }}
-                                    onClose={() => handleCloseTab(card)}
-                                />
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <div className="note-tools-section bordered">
-                    <div className="tools-section">
-                        <div className="arrow-container">
-                            <IconButton iconName="arrow_back" />
-                            <IconButton iconName="arrow_forward" />
-                        </div>
-                        <IconButton iconName="more_vert" />
-                    </div>
-                    <div className="note-section">
-                        <div className="editor-wrapper">
-                            <TextEditor
-                                noteId={selectedCardId ? selectedCardId : -1}
-                                initialValue={
-                                    notesSnapshot.find(
-                                        (note) => note.id === selectedCardId
-                                    )?.content!!
-                                }
-                                onChange={() => {}}
-                                onChangeDebounce={(updatedContent) =>
-                                    handleUpdate(
-                                        updatedContent,
-                                        selectedCardId!!
-                                    )
-                                }
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <MainPageDrawer
+                handleAdd={handleAdd}
+                handleNewTab={handleNewCard}
+                handleRename={handleRename}
+                selectedCardId={selectedCardId}
+                notesSnapshot={notesSnapshot}
+            />
+            <MainPagePanel
+                handleUpdate={handleUpdate}
+                handleNewCard={handleNewCard}
+                handleCloseCard={handleCloseCard}
+                openedCards={openedCards}
+                selectedCardId={selectedCardId}
+                notesSnapshot={notesSnapshot}
+            />
         </div>
     );
 }
