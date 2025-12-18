@@ -5,6 +5,7 @@ import MainPageDrawer from "./components/MainPageDrawer";
 import MainPagePanel from "./components/MainPagePanel";
 import Popover from "../../shared/components/Popover";
 import type { Rect } from "../../shared/types/Rect";
+import PopoverItem from "../../shared/components/PopoverItem";
 
 export default function MainPage() {
     const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
@@ -38,14 +39,17 @@ export default function MainPage() {
      * @param newTitle a new title that will be assigned to the note with above id
      */
     const handleRename = (id: number, newTitle: string) => {
-        const newArray: NoteObject[] = notesSnapshot.map((item: NoteObject) =>
-            item.id == id
+        console.log(`Array before ${JSON.stringify(notesSnapshot)}`);
+
+        const newArray = notesSnapshot.map((note) =>
+            note.id === id
                 ? {
-                      ...item,
+                      ...note,
                       title: newTitle,
                   }
-                : item
+                : note
         );
+        console.log(`Renaming ${JSON.stringify(newArray)}`);
 
         updateStorage(newArray);
         syncReact();
@@ -99,6 +103,26 @@ export default function MainPage() {
 
         updateStorage(updatedNotesSnapshot);
     };
+
+    // const handleDelete = (noteId: number) => {
+    //     handleCloseCard(noteId);
+    //     const indexToRemove = notesSnapshot.findIndex(
+    //         (note) => note.id === noteId
+    //     );
+
+    //     if (indexToRemove === -1) {
+    //         console.log(`Nothing to delete (noteId: ${noteId})`);
+    //         return;
+    //     }
+
+    //     const updatedNotesSnapshot: NoteObject[] = notesSnapshot.splice(
+    //         indexToRemove,
+    //         1
+    //     );
+
+    //     updateStorage(updatedNotesSnapshot);
+    //     syncReact();
+    // };
 
     /**
      * Synchronizes react with local storage
@@ -163,9 +187,19 @@ export default function MainPage() {
                 isOpen={isPopoverOpen}
                 anchor={anchor}
                 onClose={() => {
-                    console.log("Closing popover");
+                    setPopoverOpen(false);
                 }}
-            />
+            >
+                <PopoverItem actionName="Copy" iconName="content_copy" />
+                <PopoverItem actionName="Rename" iconName="edit" />
+                <PopoverItem
+                    actionName="Delete"
+                    iconName="delete"
+                    onClick={() => {
+                        //handleDelete(1766062311127)
+                    }}
+                />
+            </Popover>
         </div>
     );
 }

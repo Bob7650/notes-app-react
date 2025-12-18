@@ -23,12 +23,22 @@
     border-radius: 0;
     border: none;
     outline: none;
+    cursor: pointer;
+
+    background-color: white;
+
+    color: var(--icon-secondary);
+}
+
+.item-action-button:hover {
+    background-color: var(--bg-default-hover);
+    color: var(--icon-secondary-hover);
 }
 
 .item-action-name {
-    font-size: medium;
+    font-size: small;
 }
 
 .item-action-icon {
-    color: rgb(216, 24, 24);
+    font-size: medium;
 }

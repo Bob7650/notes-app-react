@@ -1,7 +1,12 @@
 import { createPortal } from "react-dom";
 import "./Popover.style.css";
-import PopoverItem from "./PopoverItem";
-import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import {
+    useLayoutEffect,
+    useRef,
+    useState,
+    type CSSProperties,
+    type ReactNode,
+} from "react";
 import type { Rect } from "../types/Rect";
 import useOutsideClick from "../hooks/useOutsideClick";
 
@@ -9,9 +14,10 @@ interface Props {
     isOpen: boolean;
     anchor: Rect | null;
     onClose: () => void;
+    children: ReactNode | ReactNode[];
 }
 
-export default function Popover({ isOpen, anchor, onClose }: Props) {
+export default function Popover({ isOpen, anchor, onClose, children }: Props) {
     const popoverRef = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState<CSSProperties | undefined>(
         undefined
@@ -56,7 +62,7 @@ export default function Popover({ isOpen, anchor, onClose }: Props) {
     if (!isOpen) return null;
     return createPortal(
         <div className="popover-wrapper" ref={popoverRef} style={position}>
-            <PopoverItem actionName="Delete" iconName="delete" />
+            {children}
         </div>,
         document.getElementById("portal")!!
     );
