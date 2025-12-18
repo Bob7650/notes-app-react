@@ -24,7 +24,7 @@ export default function TextEditor({
         if (editorRef.current && noteId !== lastIdRef.current) {
             editorRef.current.innerText = initialValue;
             lastIdRef.current = noteId;
-            console.log("Replaced");
+            //console.log("Replaced");
         }
     }, [noteId]);
 

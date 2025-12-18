@@ -29,8 +29,8 @@ export default function MainPage() {
 
         const newArray = [...notesSnapshot, newNote];
 
+        setNotesState(newArray);
         updateStorage(newArray);
-        syncReact();
     };
 
     /**
@@ -51,8 +51,8 @@ export default function MainPage() {
         );
         console.log(`Renaming ${JSON.stringify(newArray)}`);
 
+        setNotesState(newArray);
         updateStorage(newArray);
-        syncReact();
     };
 
     /**
@@ -64,8 +64,8 @@ export default function MainPage() {
         setOpenedTabs((tabs) =>
             tabs.includes(tabId) ? tabs : [...tabs, tabId]
         );
+
         setSelectedCardId(tabId);
-        syncReact();
     };
 
     /**
@@ -83,7 +83,10 @@ export default function MainPage() {
      * @param id id of a note, that will be changed
      */
     const handleUpdate = (updatedContent: string, id: number): void => {
-        if (!id) return;
+        if (!id) {
+            console.log(`Note does not exist (note id: ${id})`);
+            return;
+        }
 
         const noteSpanshot = notesSnapshot.find((note) => note.id === id);
 
@@ -101,6 +104,7 @@ export default function MainPage() {
             note.id === updatedNoteSnapshot.id ? updatedNoteSnapshot : note
         );
 
+        setNotesState(updatedNotesSnapshot);
         updateStorage(updatedNotesSnapshot);
     };
 
@@ -123,24 +127,6 @@ export default function MainPage() {
     //     updateStorage(updatedNotesSnapshot);
     //     syncReact();
     // };
-
-    /**
-     * Synchronizes react with local storage
-     */
-    const syncReact = () => {
-        //Sync React with local storage
-        const notesJson = localStorage.getItem("notes");
-
-        if (!notesJson) {
-            console.error("Could not find notes in local storage!");
-            return;
-        }
-
-        const storageNotes: NoteObject[] = JSON.parse(notesJson);
-        setNotesState(storageNotes);
-
-        console.log(`Synced React with storage.`);
-    };
 
     /**
      * Utility function that saves notes to the local storage
