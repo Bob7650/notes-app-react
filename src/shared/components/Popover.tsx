@@ -19,11 +19,35 @@ export default function Popover({ isOpen, anchor, onClose }: Props) {
 
     //TODO: fix this so that it renders right
     useLayoutEffect(() => {
-        if (!anchor) return;
+        if (!anchor || !popoverRef.current) return;
+
+        const popoverData = popoverRef.current.getBoundingClientRect();
+
+        let left = 0;
+        let top = 0;
+
+        if (anchor.x + popoverData.width > innerWidth) {
+            // No horizontal fit
+            left = anchor.x - popoverData.width + anchor.width;
+        } else {
+            // Fit
+            left = anchor.x;
+        }
+
+        if (anchor.y + popoverData.height > innerHeight) {
+            // No vertical fit
+            top = anchor.y - popoverData.height;
+        } else {
+            // Fit
+            top = anchor.y + anchor.height;
+        }
+
+        console.log(`Showing popover at: ${top} ${left}`);
+        console.log(`Is Open: ${isOpen}`);
 
         setPosition({
-            top: anchor.y + anchor.height,
-            left: anchor.x - 150,
+            top: top,
+            left: left,
         });
     }, [anchor]);
 

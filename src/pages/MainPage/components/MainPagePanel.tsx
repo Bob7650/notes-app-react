@@ -1,15 +1,15 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import NoteCard from "../../../shared/components/NoteCard";
 import IconButton from "../../../shared/components/IconButton";
 import TextEditor from "../../../shared/components/TextEditor";
 import type { NoteObject } from "../../../shared/types/NoteObject";
 import type { Rect } from "../../../shared/types/Rect";
-import Popover from "../../../shared/components/Popover";
 
 interface Props {
     handleUpdate: (newContents: string, noteId: number) => void;
     handleNewCard: (noteId: number) => void;
     handleCloseCard: (cardId: number) => void;
+    handleDisplayPopover: (newAnchor: Rect) => void;
     openedCards: number[];
     selectedCardId: number | null;
     notesSnapshot: NoteObject[];
@@ -19,6 +19,7 @@ export default function MainPagePanel({
     handleUpdate,
     handleNewCard,
     handleCloseCard,
+    handleDisplayPopover,
     openedCards,
     selectedCardId,
     notesSnapshot,
@@ -26,26 +27,8 @@ export default function MainPagePanel({
     const mainTopBarRef = useRef<HTMLDivElement>(null);
     const moreButtonRef = useRef<HTMLButtonElement>(null);
 
-    const [isPopoverOpen, setPopoverOpen] = useState(false);
-    const [anchor, setAnchor] = useState<Rect>({
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-    });
-
-    const handleDisplayPopover = (newAnchor: Rect) => {
-        setAnchor(newAnchor);
-        setPopoverOpen(true);
-    };
-
     return (
         <div className="main-panel-section">
-            <Popover
-                isOpen={isPopoverOpen}
-                anchor={anchor}
-                onClose={() => setPopoverOpen(false)}
-            />
             <div
                 className="main-top-bar bordered"
                 onWheel={(e) => {

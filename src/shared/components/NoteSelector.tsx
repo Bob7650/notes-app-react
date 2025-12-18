@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type MouseEvent } from "react";
 import "./NoteSelector.style.css";
 import useOutsideClick from "../hooks/useOutsideClick";
 import type { NoteObject } from "../types/NoteObject";
@@ -6,14 +6,16 @@ import type { NoteObject } from "../types/NoteObject";
 interface Props {
     data: NoteObject;
     onRename: (id: number, newName: string) => void;
-    onClick?: () => void;
+    onMouseDown?: (
+        e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>
+    ) => void;
     isSelected?: boolean;
 }
 
 export default function NoteSelector({
     data,
     onRename,
-    onClick,
+    onMouseDown,
     isSelected,
 }: Props) {
     const [inputValue, setInputValue] = useState<string>(data.title);
@@ -51,8 +53,11 @@ export default function NoteSelector({
 
     return (
         <div
+            onContextMenu={(e) => e.preventDefault()}
             tabIndex={0}
-            onClick={onClick}
+            onMouseDown={(e) => {
+                onMouseDown?.(e);
+            }}
             className={`note-selector-wrapper${
                 isSelected ? " note-selected" : ""
             }`}

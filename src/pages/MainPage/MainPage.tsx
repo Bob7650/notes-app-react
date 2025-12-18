@@ -3,6 +3,8 @@ import "./MainPage.style.css";
 import type { NoteObject } from "../../shared/types/NoteObject";
 import MainPageDrawer from "./components/MainPageDrawer";
 import MainPagePanel from "./components/MainPagePanel";
+import Popover from "../../shared/components/Popover";
+import type { Rect } from "../../shared/types/Rect";
 
 export default function MainPage() {
     const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
@@ -125,12 +127,26 @@ export default function MainPage() {
         console.log("Updated storage");
     };
 
+    const [isPopoverOpen, setPopoverOpen] = useState(false);
+    const [anchor, setAnchor] = useState<Rect>({
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+    });
+
+    const handleDisplayPopover = (newAnchor: Rect) => {
+        setAnchor(newAnchor);
+        setPopoverOpen(true);
+    };
+
     return (
         <div className="app-container">
             <MainPageDrawer
                 handleAdd={handleAdd}
                 handleNewTab={handleNewCard}
                 handleRename={handleRename}
+                handleDisplayPopover={handleDisplayPopover}
                 selectedCardId={selectedCardId}
                 notesSnapshot={notesSnapshot}
             />
@@ -138,9 +154,17 @@ export default function MainPage() {
                 handleUpdate={handleUpdate}
                 handleNewCard={handleNewCard}
                 handleCloseCard={handleCloseCard}
+                handleDisplayPopover={handleDisplayPopover}
                 openedCards={openedCards}
                 selectedCardId={selectedCardId}
                 notesSnapshot={notesSnapshot}
+            />
+            <Popover
+                isOpen={isPopoverOpen}
+                anchor={anchor}
+                onClose={() => {
+                    console.log("Closing popover");
+                }}
             />
         </div>
     );

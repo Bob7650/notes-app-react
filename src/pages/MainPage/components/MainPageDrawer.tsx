@@ -1,11 +1,13 @@
 import IconButton from "../../../shared/components/IconButton";
 import NoteSelector from "../../../shared/components/NoteSelector";
 import type { NoteObject } from "../../../shared/types/NoteObject";
+import type { Rect } from "../../../shared/types/Rect";
 
 interface Props {
     handleAdd: () => void;
     handleRename: (noteId: number, newName: string) => void;
     handleNewTab: (noteId: number) => void;
+    handleDisplayPopover: (newAnchor: Rect) => void;
     notesSnapshot: NoteObject[];
     selectedCardId: number | null;
 }
@@ -14,6 +16,7 @@ export default function MainPageDrawer({
     handleAdd,
     handleRename,
     handleNewTab,
+    handleDisplayPopover,
     notesSnapshot,
     selectedCardId,
 }: Props) {
@@ -36,7 +39,20 @@ export default function MainPageDrawer({
                             <NoteSelector
                                 data={singleNote}
                                 isSelected={selectedCardId === singleNote.id}
-                                onClick={() => handleNewTab(singleNote.id)}
+                                onMouseDown={(e) => {
+                                    if (e.button === 0)
+                                        handleNewTab(singleNote.id);
+                                    else if (e.button === 2) {
+                                        handleDisplayPopover({
+                                            x: e.clientX,
+                                            y: e.clientY,
+                                            width: 0,
+                                            height: 0,
+                                        });
+                                        e.stopPropagation();
+                                    }
+                                    console.log(e.button);
+                                }}
                                 onRename={handleRename}
                             />
                         </li>
