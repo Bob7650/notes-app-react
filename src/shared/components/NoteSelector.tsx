@@ -46,9 +46,7 @@ export default function NoteSelector({
     };
 
     useOutsideClick(() => {
-        if (editableInputRef.current && !editableInputRef.current.hidden) {
-            confirmRename();
-        }
+        confirmRename();
     }, editableInputRef);
 
     return (
@@ -79,6 +77,11 @@ export default function NoteSelector({
                 }}
                 className="editable-input"
                 hidden={true}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                        confirmRename();
+                    }
+                }}
                 ref={editableInputRef}
             />
         </div>

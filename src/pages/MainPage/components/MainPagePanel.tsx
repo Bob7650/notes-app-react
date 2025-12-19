@@ -9,7 +9,7 @@ interface Props {
     handleUpdate: (newContents: string, noteId: number) => void;
     handleNewCard: (noteId: number) => void;
     handleCloseCard: (cardId: number) => void;
-    handleDisplayPopover: (newAnchor: Rect) => void;
+    handleDisplayPopover: (callerId: number, newAnchor: Rect) => void;
     openedCards: number[];
     selectedCardId: number | null;
     notesSnapshot: NoteObject[];
@@ -86,7 +86,7 @@ export default function MainPagePanel({
                                     width: buttonData.width,
                                     height: buttonData.height,
                                 };
-                                handleDisplayPopover(anchor);
+                                handleDisplayPopover(selectedCardId!!, anchor);
                             }
                         }}
                     />

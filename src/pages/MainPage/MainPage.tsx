@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./MainPage.style.css";
 import type { NoteObject } from "../../shared/types/NoteObject";
 import MainPageDrawer from "./components/MainPageDrawer";
@@ -30,7 +30,6 @@ export default function MainPage() {
         const newArray = [...notesSnapshot, newNote];
 
         setNotesState(newArray);
-        updateStorage(newArray);
     };
 
     /**
@@ -39,8 +38,6 @@ export default function MainPage() {
      * @param newTitle a new title that will be assigned to the note with above id
      */
     const handleRename = (id: number, newTitle: string) => {
-        console.log(`Array before ${JSON.stringify(notesSnapshot)}`);
-
         const newArray = notesSnapshot.map((note) =>
             note.id === id
                 ? {
@@ -52,7 +49,6 @@ export default function MainPage() {
         console.log(`Renaming ${JSON.stringify(newArray)}`);
 
         setNotesState(newArray);
-        updateStorage(newArray);
     };
 
     /**
@@ -105,39 +101,39 @@ export default function MainPage() {
         );
 
         setNotesState(updatedNotesSnapshot);
-        updateStorage(updatedNotesSnapshot);
     };
 
-    // const handleDelete = (noteId: number) => {
-    //     handleCloseCard(noteId);
-    //     const indexToRemove = notesSnapshot.findIndex(
-    //         (note) => note.id === noteId
-    //     );
+    const handleDelete = (noteId: number) => {
+        handleCloseCard(noteId);
+        const indexToRemove = notesSnapshot.findIndex(
+            (note) => note.id === noteId
+        );
 
-    //     if (indexToRemove === -1) {
-    //         console.log(`Nothing to delete (noteId: ${noteId})`);
-    //         return;
-    //     }
+        if (indexToRemove === -1) {
+            console.log(`Nothing to delete (noteId: ${noteId})`);
+            return;
+        }
 
-    //     const updatedNotesSnapshot: NoteObject[] = notesSnapshot.splice(
-    //         indexToRemove,
-    //         1
-    //     );
+        const updatedNotesSnapshot: NoteObject[] = notesSnapshot.splice(
+            indexToRemove,
+            1
+        );
 
-    //     updateStorage(updatedNotesSnapshot);
-    //     syncReact();
-    // };
+        setNotesState(updatedNotesSnapshot);
+    };
 
     /**
      * Utility function that saves notes to the local storage
-     * @param updatedNotes NoteObject[] array that will be saved to storage
      */
-    const updateStorage = (updatedNotes: NoteObject[]) => {
-        localStorage.setItem("notes", JSON.stringify(updatedNotes));
+    const updateStorage = () => {
+        localStorage.setItem("notes", JSON.stringify(notesSnapshot));
         console.log("Updated storage");
     };
 
+    useEffect(updateStorage, [notesSnapshot]);
+
     const [isPopoverOpen, setPopoverOpen] = useState(false);
+    const [popoverCaller, setPopoverCaller] = useState<number | null>(null);
     const [anchor, setAnchor] = useState<Rect>({
         x: 0,
         y: 0,
@@ -145,7 +141,8 @@ export default function MainPage() {
         height: 0,
     });
 
-    const handleDisplayPopover = (newAnchor: Rect) => {
+    const handleDisplayPopover = (callerId: number, newAnchor: Rect) => {
+        setPopoverCaller(callerId);
         setAnchor(newAnchor);
         setPopoverOpen(true);
     };
@@ -182,7 +179,11 @@ export default function MainPage() {
                     actionName="Delete"
                     iconName="delete"
                     onClick={() => {
-                        //handleDelete(1766062311127)
+                        if (!popoverCaller) {
+                            console.log("No popover open!");
+                            return;
+                        }
+                        handleDelete(popoverCaller);
                     }}
                 />
             </Popover>

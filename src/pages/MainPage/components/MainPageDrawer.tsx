@@ -7,7 +7,7 @@ interface Props {
     handleAdd: () => void;
     handleRename: (noteId: number, newName: string) => void;
     handleNewTab: (noteId: number) => void;
-    handleDisplayPopover: (newAnchor: Rect) => void;
+    handleDisplayPopover: (callerId: number, newAnchor: Rect) => void;
     notesSnapshot: NoteObject[];
     selectedCardId: number | null;
 }
@@ -43,7 +43,7 @@ export default function MainPageDrawer({
                                     if (e.button === 0)
                                         handleNewTab(singleNote.id);
                                     else if (e.button === 2) {
-                                        handleDisplayPopover({
+                                        handleDisplayPopover(singleNote.id, {
                                             x: e.clientX,
                                             y: e.clientY,
                                             width: 0,
