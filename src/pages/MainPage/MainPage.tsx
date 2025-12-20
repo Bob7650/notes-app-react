@@ -114,11 +114,10 @@ export default function MainPage() {
             return;
         }
 
-        const updatedNotesSnapshot: NoteObject[] = notesSnapshot.splice(
-            indexToRemove,
-            1
-        );
+        const updatedNotesSnapshot: NoteObject[] = notesSnapshot.slice();
+        updatedNotesSnapshot.splice(indexToRemove, 1);
 
+        console.log(`Removed index ${indexToRemove}`);
         setNotesState(updatedNotesSnapshot);
     };
 
@@ -185,6 +184,7 @@ export default function MainPage() {
                             return;
                         }
                         handleDelete(popoverCaller);
+                        setPopoverOpen(false);
                     }}
                 />
             </Popover>
