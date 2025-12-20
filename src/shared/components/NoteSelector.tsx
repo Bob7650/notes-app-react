@@ -19,71 +19,66 @@ export default function NoteSelector({
     isSelected,
 }: Props) {
     const [inputValue, setInputValue] = useState<string>(data.title);
+    const [isRenaming, setRenaming] = useState(false);
 
-    const editableInputRef = useRef<HTMLInputElement>(null);
-    const editableSpanRef = useRef<HTMLSpanElement>(null);
+    const noteSelectorRef = useRef<HTMLInputElement>(null);
 
     const confirmRename = () => {
-        if (editableInputRef.current) {
-            onRename(data.id, editableInputRef.current.value);
-        }
+        console.log(`Renaming to ${inputValue}`);
+        onRename(data.id, inputValue);
         cancelRename();
     };
 
     const cancelRename = () => {
-        if (editableSpanRef.current && editableInputRef.current) {
-            editableSpanRef.current.hidden = false;
-            editableInputRef.current.hidden = true;
-        }
+        setRenaming(false);
     };
 
     const startRename = () => {
-        if (editableSpanRef.current && editableInputRef.current) {
-            editableSpanRef.current.hidden = true;
-            editableInputRef.current.hidden = false;
-            editableInputRef.current.focus();
-        }
+        setRenaming(true);
     };
 
-    useOutsideClick(() => {
-        confirmRename();
-    }, editableInputRef);
+    useOutsideClick(
+        () => {
+            if (isRenaming) confirmRename();
+        },
+        noteSelectorRef,
+        [isRenaming, confirmRename]
+    );
 
     return (
         <div
+            className={`note-selector-wrapper${
+                isSelected ? " note-selected" : ""
+            }`}
+            ref={noteSelectorRef}
             onContextMenu={(e) => e.preventDefault()}
             tabIndex={0}
             onMouseDown={(e) => {
                 onMouseDown?.(e);
             }}
-            className={`note-selector-wrapper${
-                isSelected ? " note-selected" : ""
-            }`}
         >
             {[...Array(data.depth)].map(() => (
                 <span className="indent-bar">|</span>
             ))}
-            <span
-                className="editable-label"
-                onDoubleClick={startRename}
-                ref={editableSpanRef}
-            >
-                {data.title}
-            </span>
-            <input
-                value={inputValue}
-                onChange={(e) => {
-                    setInputValue(e.target.value);
-                }}
-                className="editable-input"
-                hidden={true}
-                onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                        confirmRename();
-                    }
-                }}
-                ref={editableInputRef}
-            />
+            {isRenaming ? (
+                <input
+                    className="editable-input"
+                    value={inputValue}
+                    onChange={(e) => {
+                        setInputValue(e.target.value);
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            confirmRename();
+                        }
+                    }}
+                    autoFocus
+                />
+            ) : (
+                <span className="editable-label" onDoubleClick={startRename}>
+                    {data.title}
+                </span>
+            )}
         </div>
     );
 }

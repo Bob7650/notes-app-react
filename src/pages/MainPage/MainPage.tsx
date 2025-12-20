@@ -126,6 +126,7 @@ export default function MainPage() {
      * Utility function that saves notes to the local storage
      */
     const updateStorage = () => {
+        console.log(`Current notes state ${JSON.stringify(notesSnapshot)}`);
         localStorage.setItem("notes", JSON.stringify(notesSnapshot));
         console.log("Updated storage");
     };
