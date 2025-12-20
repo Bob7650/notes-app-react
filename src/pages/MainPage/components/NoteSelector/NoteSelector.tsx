@@ -1,7 +1,7 @@
 import { useRef, useState, type MouseEvent } from "react";
 import "./NoteSelector.style.css";
-import useOutsideClick from "../hooks/useOutsideClick";
-import type { NoteObject } from "../types/NoteObject";
+import useOutsideClick from "../../../../shared/hooks/useOutsideClick";
+import type { NoteObject } from "../../../../shared/types/NoteObject";
 
 interface Props {
     data: NoteObject;

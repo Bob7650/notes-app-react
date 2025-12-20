@@ -1,4 +1,4 @@
-import IconButton from "./IconButton";
+import IconButton from "../../../../shared/components/IconButton";
 import "./NoteCard.style.css";
 
 interface Props {

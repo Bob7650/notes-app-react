@@ -1,5 +1,5 @@
 import IconButton from "../../../shared/components/IconButton";
-import NoteSelector from "../../../shared/components/NoteSelector";
+import NoteSelector from "./NoteSelector/NoteSelector";
 import type { NoteObject } from "../../../shared/types/NoteObject";
 import type { Rect } from "../../../shared/types/Rect";
 

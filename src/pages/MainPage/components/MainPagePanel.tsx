@@ -1,7 +1,7 @@
 import { useRef } from "react";
-import NoteCard from "../../../shared/components/NoteCard";
+import NoteCard from "./NoteCard/NoteCard";
 import IconButton from "../../../shared/components/IconButton";
-import TextEditor from "../../../shared/components/TextEditor";
+import TextEditor from "./TextEditor/TextEditor";
 import type { NoteObject } from "../../../shared/types/NoteObject";
 import type { Rect } from "../../../shared/types/Rect";
 
