@@ -9,7 +9,7 @@ import PopoverItem from "../../shared/components/PopoverItem";
 
 export default function MainPage() {
     const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
-    const [openedCards, setOpenedTabs] = useState<number[]>([]);
+    const [openedCards, setOpenedCards] = useState<number[]>([]);
     const [notesSnapshot, setNotesState] = useState<NoteObject[]>(() => {
         const savedNotes = localStorage.getItem("notes");
         if (!savedNotes) localStorage.setItem("notes", "[]");
@@ -56,7 +56,7 @@ export default function MainPage() {
      */
     const handleNewCard = (noteId: number) => {
         const tabId = noteId;
-        setOpenedTabs((tabs) =>
+        setOpenedCards((tabs) =>
             tabs.includes(tabId) ? tabs : [...tabs, tabId]
         );
 
@@ -68,8 +68,24 @@ export default function MainPage() {
      * @param cardId id of a card to be closed
      */
     const handleCloseCard = (cardId: number) => {
-        setOpenedTabs(openedCards.filter((tab) => tab !== cardId));
-        if (cardId === selectedCardId) setSelectedCardId(null);
+        if (cardId === selectedCardId) {
+            const currentCardInd = openedCards.findIndex(
+                (card) => card === cardId
+            );
+
+            if (currentCardInd === -1) {
+                console.error(
+                    "No current card opened! (This shouldn't happen)"
+                );
+            }
+
+            let newCardId: number | null = null;
+            if (currentCardInd > 0) newCardId = openedCards[currentCardInd - 1];
+            else if (currentCardInd < openedCards.length)
+                newCardId = openedCards[currentCardInd + 1];
+            setSelectedCardId(newCardId);
+        }
+        setOpenedCards(openedCards.filter((tab) => tab !== cardId));
     };
 
     /**
