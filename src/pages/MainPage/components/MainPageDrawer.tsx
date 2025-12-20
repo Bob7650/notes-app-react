@@ -51,7 +51,6 @@ export default function MainPageDrawer({
                                         });
                                         e.stopPropagation();
                                     }
-                                    console.log(e.button);
                                 }}
                                 onRename={handleRename}
                             />

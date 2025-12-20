@@ -23,7 +23,6 @@ export default function Popover({ isOpen, anchor, onClose, children }: Props) {
         undefined
     );
 
-    //TODO: fix this so that it renders right
     useLayoutEffect(() => {
         if (!anchor || !popoverRef.current) return;
 
@@ -48,9 +47,6 @@ export default function Popover({ isOpen, anchor, onClose, children }: Props) {
             top = anchor.y + anchor.height;
         }
 
-        console.log(`Showing popover at: ${top} ${left}`);
-        console.log(`Is Open: ${isOpen}`);
-
         setPosition({
             top: top,
             left: left,
@@ -61,7 +57,12 @@ export default function Popover({ isOpen, anchor, onClose, children }: Props) {
 
     if (!isOpen) return null;
     return createPortal(
-        <div className="popover-wrapper" ref={popoverRef} style={position}>
+        <div
+            className="popover-wrapper"
+            ref={popoverRef}
+            style={position}
+            onClick={onClose}
+        >
             {children}
         </div>,
         document.getElementById("portal")!!

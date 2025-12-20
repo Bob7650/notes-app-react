@@ -46,7 +46,6 @@ export default function MainPage() {
                   }
                 : note
         );
-        console.log(`Renaming ${JSON.stringify(newArray)}`);
 
         setNotesState(newArray);
     };
@@ -79,15 +78,10 @@ export default function MainPage() {
      * @param id id of a note, that will be changed
      */
     const handleUpdate = (updatedContent: string, id: number): void => {
-        if (!id) {
-            console.log(`Note does not exist (note id: ${id})`);
-            return;
-        }
-
         const noteSpanshot = notesSnapshot.find((note) => note.id === id);
 
         if (!noteSpanshot) {
-            console.error(`The updated note does not exist (note id: ${id})`);
+            console.error(`No note to write to! (note id: ${id})`);
             return;
         }
 
@@ -110,14 +104,13 @@ export default function MainPage() {
         );
 
         if (indexToRemove === -1) {
-            console.log(`Nothing to delete (noteId: ${noteId})`);
+            console.error(`Nothing to delete! (noteId: ${noteId})`);
             return;
         }
 
         const updatedNotesSnapshot: NoteObject[] = notesSnapshot.slice();
         updatedNotesSnapshot.splice(indexToRemove, 1);
 
-        console.log(`Removed index ${indexToRemove}`);
         setNotesState(updatedNotesSnapshot);
     };
 
@@ -125,9 +118,7 @@ export default function MainPage() {
      * Utility function that saves notes to the local storage
      */
     const updateStorage = () => {
-        console.log(`Current notes state ${JSON.stringify(notesSnapshot)}`);
         localStorage.setItem("notes", JSON.stringify(notesSnapshot));
-        console.log("Updated storage");
     };
 
     useEffect(updateStorage, [notesSnapshot]);
@@ -180,11 +171,10 @@ export default function MainPage() {
                     iconName="delete"
                     onClick={() => {
                         if (!popoverCaller) {
-                            console.log("No popover open!");
+                            console.error("No popover open!");
                             return;
                         }
                         handleDelete(popoverCaller);
-                        setPopoverOpen(false);
                     }}
                 />
             </Popover>

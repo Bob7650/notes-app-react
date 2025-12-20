@@ -24,7 +24,6 @@ export default function TextEditor({
         if (editorRef.current && noteId !== lastIdRef.current) {
             editorRef.current.innerText = initialValue;
             lastIdRef.current = noteId;
-            //console.log("Replaced");
         }
     }, [noteId]);
 
@@ -43,7 +42,6 @@ export default function TextEditor({
     return (
         <div
             ref={editorRef}
-            onBlur={() => console.log("blurred")}
             className="text-editor"
             onInput={handleInput}
             contentEditable={true}

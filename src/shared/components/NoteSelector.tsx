@@ -24,7 +24,6 @@ export default function NoteSelector({
     const noteSelectorRef = useRef<HTMLInputElement>(null);
 
     const confirmRename = () => {
-        console.log(`Renaming to ${inputValue}`);
         onRename(data.id, inputValue);
         cancelRename();
     };
