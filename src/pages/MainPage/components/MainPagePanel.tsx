@@ -1,31 +1,25 @@
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import NoteCard from "./NoteCard/NoteCard";
 import IconButton from "../../../shared/components/IconButton";
 import TextEditor from "./TextEditor/TextEditor";
-import type { NoteObject } from "../../../shared/types/NoteObject";
-import type { Rect } from "../../../shared/types/Rect";
+import { NotesContext } from "../../../shared/context/NotesContext";
 
 interface Props {
-    handleUpdate: (newContents: string, noteId: number) => void;
     handleNewCard: (noteId: number) => void;
     handleCloseCard: (cardId: number) => void;
-    handleDisplayPopover: (callerId: number, newAnchor: Rect) => void;
     openedCards: number[];
     selectedCardId: number | null;
-    notesSnapshot: NoteObject[];
 }
 
 export default function MainPagePanel({
-    handleUpdate,
     handleNewCard,
     handleCloseCard,
-    handleDisplayPopover,
     openedCards,
     selectedCardId,
-    notesSnapshot,
 }: Props) {
+    const [notes, dispatch] = useContext(NotesContext);
+
     const mainTopBarRef = useRef<HTMLDivElement>(null);
-    const moreButtonRef = useRef<HTMLButtonElement>(null);
 
     return (
         <div className="main-panel-section">
@@ -49,13 +43,8 @@ export default function MainPagePanel({
                         <li key={card}>
                             <NoteCard
                                 title={
-                                    notesSnapshot.find(
-                                        (note) => note.id === card
-                                    )?.title
-                                        ? notesSnapshot.find(
-                                              (note) => note.id === card
-                                          )?.title!!
-                                        : ""
+                                    notes.find((note) => note.id === card)
+                                        ?.title ?? ""
                                 }
                                 isSelected={selectedCardId === card}
                                 onClick={() => {
@@ -73,36 +62,23 @@ export default function MainPagePanel({
                         <IconButton iconName="arrow_back" />
                         <IconButton iconName="arrow_forward" />
                     </div>
-                    <IconButton
-                        iconName="more_vert"
-                        ref={moreButtonRef}
-                        onClick={() => {
-                            if (moreButtonRef.current) {
-                                const buttonData =
-                                    moreButtonRef.current.getBoundingClientRect();
-                                const anchor: Rect = {
-                                    x: buttonData.x,
-                                    y: buttonData.y,
-                                    width: buttonData.width,
-                                    height: buttonData.height,
-                                };
-                                handleDisplayPopover(selectedCardId!!, anchor);
-                            }
-                        }}
-                    />
+                    <IconButton iconName="more_vert" />
                 </div>
                 <div className="note-section">
                     <div className="editor-wrapper">
                         <TextEditor
                             noteId={selectedCardId ? selectedCardId : -1}
                             initialValue={
-                                notesSnapshot.find(
-                                    (note) => note.id === selectedCardId
-                                )?.content!!
+                                notes.find((note) => note.id === selectedCardId)
+                                    ?.content ?? ""
                             }
                             onChange={() => {}}
                             onChangeDebounce={(updatedContent) =>
-                                handleUpdate(updatedContent, selectedCardId!!)
+                                dispatch({
+                                    type: "UPDATE",
+                                    id: selectedCardId ?? -1,
+                                    newContent: updatedContent,
+                                })
                             }
                         />
                     </div>
