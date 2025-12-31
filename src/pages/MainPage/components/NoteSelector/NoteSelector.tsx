@@ -12,10 +12,16 @@ interface Props {
     onMouseDown?: (
         e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>
     ) => void;
+    onDelete?: () => void;
     isSelected?: boolean;
 }
 
-export default function NoteSelector({ data, onMouseDown, isSelected }: Props) {
+export default function NoteSelector({
+    data,
+    onMouseDown,
+    onDelete,
+    isSelected,
+}: Props) {
     const dispatch = useContext(NotesContext)[1];
 
     const [inputValue, setInputValue] = useState<string>(data.title);
@@ -116,13 +122,16 @@ export default function NoteSelector({ data, onMouseDown, isSelected }: Props) {
                 <PopoverItem
                     actionName="Rename"
                     iconName="edit"
-                    onClick={() => {}}
+                    onClick={() => {
+                        setRenaming(true);
+                    }}
                 />
                 <PopoverItem
                     actionName="Delete"
                     iconName="delete"
                     onClick={() => {
-                        //handleDelete(data.id);
+                        onDelete?.();
+                        dispatch({ type: "DELETE", id: data.id });
                     }}
                 />
             </Popover>

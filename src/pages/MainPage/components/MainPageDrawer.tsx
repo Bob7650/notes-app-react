@@ -4,14 +4,14 @@ import { useContext } from "react";
 import { NotesContext } from "../../../shared/context/NotesContext";
 
 interface Props {
-    handleNewTab: (noteId: number) => void;
+    cardActions: {
+        new: (cardId: number) => void;
+        close: (cardId: number) => void;
+    };
     selectedCardId: number | null;
 }
 
-export default function MainPageDrawer({
-    handleNewTab,
-    selectedCardId,
-}: Props) {
+export default function MainPageDrawer({ cardActions, selectedCardId }: Props) {
     const [notes, dispatch] = useContext(NotesContext);
 
     return (
@@ -40,7 +40,10 @@ export default function MainPageDrawer({
                                 isSelected={selectedCardId === singleNote.id}
                                 onMouseDown={(e) => {
                                     if (e.button === 0)
-                                        handleNewTab(singleNote.id);
+                                        cardActions.new(singleNote.id);
+                                }}
+                                onDelete={() => {
+                                    cardActions.new(singleNote.id);
                                 }}
                             />
                         </li>

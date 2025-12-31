@@ -5,15 +5,16 @@ import TextEditor from "./TextEditor/TextEditor";
 import { NotesContext } from "../../../shared/context/NotesContext";
 
 interface Props {
-    handleNewCard: (noteId: number) => void;
-    handleCloseCard: (cardId: number) => void;
+    cardActions: {
+        new: (cardId: number) => void;
+        close: (cardId: number) => void;
+    };
     openedCards: number[];
     selectedCardId: number | null;
 }
 
 export default function MainPagePanel({
-    handleNewCard,
-    handleCloseCard,
+    cardActions,
     openedCards,
     selectedCardId,
 }: Props) {
@@ -48,9 +49,9 @@ export default function MainPagePanel({
                                 }
                                 isSelected={selectedCardId === card}
                                 onClick={() => {
-                                    handleNewCard(card);
+                                    cardActions.new(card);
                                 }}
-                                onClose={() => handleCloseCard(card)}
+                                onClose={() => cardActions.close(card)}
                             />
                         </li>
                     ))}
