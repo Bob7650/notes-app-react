@@ -18,8 +18,8 @@ export default function MainPagePanel({
     openedCards,
     selectedCardId,
 }: Props) {
-    const [notes, dispatch] = useContext(NotesContext);
-
+    //const [notes, dispatch] = useContext(NotesContext);
+    const { notes, notesActions } = useContext(NotesContext);
     const mainTopBarRef = useRef<HTMLDivElement>(null);
 
     return (
@@ -75,11 +75,15 @@ export default function MainPagePanel({
                             }
                             onChange={() => {}}
                             onChangeDebounce={(updatedContent) =>
-                                dispatch({
-                                    type: "UPDATE",
-                                    id: selectedCardId ?? -1,
-                                    newContent: updatedContent,
-                                })
+                                // dispatch({
+                                //     type: "UPDATE",
+                                //     id: selectedCardId ?? -1,
+                                //     newContent: updatedContent,
+                                // })
+                                notesActions.updateContent(
+                                    selectedCardId ?? -1,
+                                    updatedContent
+                                )
                             }
                         />
                     </div>

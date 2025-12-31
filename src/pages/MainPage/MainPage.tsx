@@ -7,7 +7,6 @@ import NotesContextProvider from "../../shared/context/NotesContextProvider";
 export default function MainPage() {
     const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
     const [openedCards, setOpenedCards] = useState<number[]>([]);
-
     const cardActions = {
         new: (cardId: number) => {
             const tabId = cardId;

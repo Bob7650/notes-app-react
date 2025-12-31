@@ -22,7 +22,8 @@ export default function NoteSelector({
     onDelete,
     isSelected,
 }: Props) {
-    const dispatch = useContext(NotesContext)[1];
+    //const dispatch = useContext(NotesContext)[1];
+    const { notesActions } = useContext(NotesContext);
 
     const [inputValue, setInputValue] = useState<string>(data.title);
     const [isRenaming, setRenaming] = useState(false);
@@ -43,7 +44,8 @@ export default function NoteSelector({
     };
 
     const confirmRename = () => {
-        dispatch({ type: "UPDATE", id: data.id, newTitle: inputValue });
+        //dispatch({ type: "UPDATE", id: data.id, newTitle: inputValue });
+        notesActions.rename(data.id, inputValue);
         cancelRename();
     };
 
@@ -118,12 +120,16 @@ export default function NoteSelector({
                     setPopoverOpen(false);
                 }}
             >
-                <PopoverItem actionName="Copy" iconName="content_copy" />
+                <PopoverItem
+                    actionName="Copy"
+                    iconName="content_copy"
+                    onClick={() => {}}
+                />
                 <PopoverItem
                     actionName="Rename"
                     iconName="edit"
                     onClick={() => {
-                        setRenaming(true);
+                        startRename();
                     }}
                 />
                 <PopoverItem
@@ -131,7 +137,7 @@ export default function NoteSelector({
                     iconName="delete"
                     onClick={() => {
                         onDelete?.();
-                        dispatch({ type: "DELETE", id: data.id });
+                        notesActions.remove(data.id);
                     }}
                 />
             </Popover>

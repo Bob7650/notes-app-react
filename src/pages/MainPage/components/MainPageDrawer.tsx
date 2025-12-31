@@ -1,7 +1,7 @@
-import IconButton from "../../../shared/components/IconButton";
-import NoteSelector from "./NoteSelector/NoteSelector";
 import { useContext } from "react";
+import IconButton from "../../../shared/components/IconButton";
 import { NotesContext } from "../../../shared/context/NotesContext";
+import NoteSelector from "./NoteSelector/NoteSelector";
 
 interface Props {
     cardActions: {
@@ -12,7 +12,8 @@ interface Props {
 }
 
 export default function MainPageDrawer({ cardActions, selectedCardId }: Props) {
-    const [notes, dispatch] = useContext(NotesContext);
+    //const [notes, dispatch] = useContext(NotesContext);
+    const { notes, notesActions } = useContext(NotesContext);
 
     return (
         <aside className="drawer-section">
@@ -26,7 +27,8 @@ export default function MainPageDrawer({ cardActions, selectedCardId }: Props) {
                     <IconButton
                         iconName="edit_square"
                         onClick={() => {
-                            dispatch({ type: "ADD" });
+                            notesActions.add();
+                            //dispatch({ type: "ADD" });
                         }}
                     />
                     <IconButton iconName="create_new_folder" />
@@ -43,7 +45,7 @@ export default function MainPageDrawer({ cardActions, selectedCardId }: Props) {
                                         cardActions.new(singleNote.id);
                                 }}
                                 onDelete={() => {
-                                    cardActions.new(singleNote.id);
+                                    cardActions.close(singleNote.id);
                                 }}
                             />
                         </li>
