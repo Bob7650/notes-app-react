@@ -2,10 +2,10 @@ import { useContext, useRef, useState, type MouseEvent } from "react";
 import "./NoteSelector.style.css";
 import useOutsideClick from "../../../../shared/hooks/useOutsideClick";
 import type { NoteObject } from "../../../../shared/types/NoteObject";
+import { NotesContext } from "../../../../shared/context/NotesContext";
 import Popover from "../../../../shared/components/Popover";
 import PopoverItem from "../../../../shared/components/PopoverItem";
 import type { Rect } from "../../../../shared/types/Rect";
-import { NotesContext } from "../../../../shared/context/NotesContext";
 
 interface Props {
     data: NoteObject;
@@ -30,19 +30,6 @@ export default function NoteSelector({
 
     const noteSelectorRef = useRef<HTMLInputElement>(null);
 
-    const [isPopoverOpen, setPopoverOpen] = useState(false);
-    const [anchor, setAnchor] = useState<Rect>({
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-    });
-
-    const handleDisplayPopover = (newAnchor: Rect) => {
-        setAnchor(newAnchor);
-        setPopoverOpen(true);
-    };
-
     const confirmRename = () => {
         //dispatch({ type: "UPDATE", id: data.id, newTitle: inputValue });
         notesActions.rename(data.id, inputValue);
@@ -55,6 +42,19 @@ export default function NoteSelector({
 
     const startRename = () => {
         setRenaming(true);
+    };
+
+    const [isPopoverOpen, setPopoverOpen] = useState(false);
+    const [anchor, setAnchor] = useState<Rect>({
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+    });
+
+    const handleDisplayPopover = (newAnchor: Rect) => {
+        setAnchor(newAnchor);
+        setPopoverOpen(true);
     };
 
     useOutsideClick(
@@ -75,6 +75,7 @@ export default function NoteSelector({
                 onContextMenu={(e) => e.preventDefault()}
                 tabIndex={0}
                 onMouseDown={(e) => {
+                    onMouseDown?.(e);
                     if (e.button === 2) {
                         handleDisplayPopover({
                             x: e.clientX,
@@ -84,7 +85,6 @@ export default function NoteSelector({
                         });
                         e.stopPropagation();
                     }
-                    onMouseDown?.(e);
                 }}
             >
                 {[...Array(data.depth)].map(() => (
@@ -135,9 +135,10 @@ export default function NoteSelector({
                 <PopoverItem
                     actionName="Delete"
                     iconName="delete"
+                    isDanger={true}
                     onClick={() => {
-                        onDelete?.();
                         notesActions.remove(data.id);
+                        onDelete?.();
                     }}
                 />
             </Popover>

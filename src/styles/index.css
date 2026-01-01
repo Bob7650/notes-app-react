@@ -15,6 +15,9 @@
     --text-default: #1e1e1e;
 
     --round-rad-default: 4px;
+
+    --icon-danger: #c24848;
+    --text-danger: #a03b3b;
 }
 
 .bordered {
