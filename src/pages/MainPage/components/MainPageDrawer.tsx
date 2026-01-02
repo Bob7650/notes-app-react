@@ -20,7 +20,6 @@ export default function MainPageDrawer({ cardActions, selectedCardId }: Props) {
             <div className="drawer-top-bar bordered">
                 <IconButton iconName="folder" />
                 <IconButton iconName="search" />
-                <IconButton iconName="bookmark" />
             </div>
             <div className="drawer-contents bordered">
                 <div className="top-icons-section">

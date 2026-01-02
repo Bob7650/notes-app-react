@@ -1,8 +1,8 @@
-import { useContext, useRef } from "react";
-import NoteCard from "./NoteCard/NoteCard";
+import { useContext } from "react";
 import IconButton from "../../../shared/components/IconButton";
 import TextEditor from "./TextEditor/TextEditor";
 import { NotesContext } from "../../../shared/context/NotesContext";
+import TopBar from "./TopBar";
 
 interface Props {
     cardActions: {
@@ -20,43 +20,14 @@ export default function MainPagePanel({
 }: Props) {
     //const [notes, dispatch] = useContext(NotesContext);
     const { notes, notesActions } = useContext(NotesContext);
-    const mainTopBarRef = useRef<HTMLDivElement>(null);
 
     return (
         <div className="main-panel-section">
-            <div
-                className="main-top-bar bordered"
-                onWheel={(e) => {
-                    if (!mainTopBarRef.current) return;
-
-                    if (
-                        mainTopBarRef.current.scrollWidth >
-                        mainTopBarRef.current.clientWidth
-                    ) {
-                        e.preventDefault();
-                        mainTopBarRef.current.scrollLeft += e.deltaY;
-                    }
-                }}
-                ref={mainTopBarRef}
-            >
-                <ul className="cards-section">
-                    {openedCards.map((card) => (
-                        <li key={card}>
-                            <NoteCard
-                                title={
-                                    notes.find((note) => note.id === card)
-                                        ?.title ?? ""
-                                }
-                                isSelected={selectedCardId === card}
-                                onClick={() => {
-                                    cardActions.new(card);
-                                }}
-                                onClose={() => cardActions.close(card)}
-                            />
-                        </li>
-                    ))}
-                </ul>
-            </div>
+            <TopBar
+                cardActions={cardActions}
+                openedCards={openedCards}
+                selectedCardId={selectedCardId}
+            />
             <div className="note-tools-section bordered">
                 <div className="tools-section">
                     <div className="arrow-container">
