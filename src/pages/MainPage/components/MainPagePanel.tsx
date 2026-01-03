@@ -1,25 +1,14 @@
 import { useContext } from "react";
 import IconButton from "../../../shared/components/IconButton";
 import TextEditor from "./TextEditor/TextEditor";
-import { NotesContext } from "../../../shared/context/NotesContext";
+import { NotesContext } from "../../../shared/context/NotesContext/NotesContext";
 import TopBar from "./TopBar";
+import { TabsContext } from "../../../shared/context/TabsContext/TabsContext";
 
-interface Props {
-    cardActions: {
-        new: (cardId: number) => void;
-        close: (cardId: number) => void;
-    };
-    openedCards: number[];
-    selectedCardId: number | null;
-}
-
-export default function MainPagePanel({
-    cardActions,
-    openedCards,
-    selectedCardId,
-}: Props) {
-    //const [notes, dispatch] = useContext(NotesContext);
+export default function MainPagePanel() {
     const { notes, notesActions } = useContext(NotesContext);
+    const { selectedCardId, openedCards, cardActions } =
+        useContext(TabsContext);
 
     return (
         <div className="main-panel-section">
@@ -46,11 +35,6 @@ export default function MainPagePanel({
                             }
                             onChange={() => {}}
                             onChangeDebounce={(updatedContent) =>
-                                // dispatch({
-                                //     type: "UPDATE",
-                                //     id: selectedCardId ?? -1,
-                                //     newContent: updatedContent,
-                                // })
                                 notesActions.updateContent(
                                     selectedCardId ?? -1,
                                     updatedContent

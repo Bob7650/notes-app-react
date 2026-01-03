@@ -2,7 +2,7 @@ import { useContext, useRef, useState, type MouseEvent } from "react";
 import "./NoteSelector.style.css";
 import useOutsideClick from "../../../../shared/hooks/useOutsideClick";
 import type { NoteObject } from "../../../../shared/types/NoteObject";
-import { NotesContext } from "../../../../shared/context/NotesContext";
+import { NotesContext } from "../../../../shared/context/NotesContext/NotesContext";
 import Popover from "../../../../shared/components/Popover";
 import PopoverItem from "../../../../shared/components/PopoverItem";
 import type { Rect } from "../../../../shared/types/Rect";
@@ -12,17 +12,10 @@ interface Props {
     onMouseDown?: (
         e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>
     ) => void;
-    onDelete?: () => void;
     isSelected?: boolean;
 }
 
-export default function NoteSelector({
-    data,
-    onMouseDown,
-    onDelete,
-    isSelected,
-}: Props) {
-    //const dispatch = useContext(NotesContext)[1];
+export default function NoteSelector({ data, onMouseDown, isSelected }: Props) {
     const { notesActions } = useContext(NotesContext);
 
     const [inputValue, setInputValue] = useState<string>(data.title);
@@ -31,7 +24,6 @@ export default function NoteSelector({
     const noteSelectorRef = useRef<HTMLInputElement>(null);
 
     const confirmRename = () => {
-        //dispatch({ type: "UPDATE", id: data.id, newTitle: inputValue });
         notesActions.rename(data.id, inputValue);
         cancelRename();
     };
@@ -138,7 +130,6 @@ export default function NoteSelector({
                     isDanger={true}
                     onClick={() => {
                         notesActions.remove(data.id);
-                        onDelete?.();
                     }}
                 />
             </Popover>

@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 import { NotesContext } from "./NotesContext";
-import { useNotes } from "../hooks/useNotes";
+import { useNotes } from "../../hooks/useNotes";
 
 export default function NotesContextProvider({
     children,

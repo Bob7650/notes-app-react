@@ -13,6 +13,7 @@ export function useNotes() {
     };
 
     const [notes, setNotes] = useState<NoteObject[]>(initialState);
+    const [lastRemoved, setLastRemoved] = useState<number | null>(null);
 
     useEffect(() => {
         localStorage.setItem("notes", JSON.stringify(notes));
@@ -34,6 +35,7 @@ export function useNotes() {
             setNotes((prevState) =>
                 prevState.filter((notes) => notes.id !== id)
             );
+            setLastRemoved(id);
         },
         rename: (id: number, title: string): void => {
             setNotes((prevState) =>
@@ -51,5 +53,5 @@ export function useNotes() {
         },
     };
 
-    return { notes, notesActions };
+    return { notes, notesActions, lastRemoved };
 }
