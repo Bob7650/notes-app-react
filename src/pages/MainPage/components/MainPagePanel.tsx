@@ -6,7 +6,7 @@ import TopBar from "./TopBar";
 import { TabsContext } from "../../../shared/context/TabsContext/TabsContext";
 
 export default function MainPagePanel() {
-    const { notes, notesActions } = useContext(NotesContext);
+    const { notes, notesActions } = useContext(NotesContext)!!;
     const { selectedCardId, openedCards, cardActions } =
         useContext(TabsContext);
 

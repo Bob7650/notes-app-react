@@ -13,11 +13,11 @@ import useOutsideClick from "../hooks/useOutsideClick";
 interface Props {
     isOpen: boolean;
     anchor: Rect | null;
-    onClose: () => void;
     children: ReactNode | ReactNode[];
+    onClose?: () => void;
 }
 
-export default function Popover({ isOpen, anchor, onClose, children }: Props) {
+export default function Popover({ isOpen, anchor, children, onClose }: Props) {
     const popoverRef = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState<CSSProperties | undefined>(
         undefined
@@ -53,16 +53,11 @@ export default function Popover({ isOpen, anchor, onClose, children }: Props) {
         });
     }, [anchor]);
 
-    useOutsideClick(onClose, popoverRef);
+    useOutsideClick(() => onClose?.(), popoverRef, [onClose]);
 
     if (!isOpen) return null;
     return createPortal(
-        <div
-            className="popover-wrapper"
-            ref={popoverRef}
-            style={position}
-            onClick={onClose}
-        >
+        <div className="popover-wrapper" ref={popoverRef} style={position}>
             {children}
         </div>,
         document.getElementById("portal")!!

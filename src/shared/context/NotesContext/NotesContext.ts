@@ -1,22 +1,12 @@
 import { createContext } from "react";
-import type { NoteObject } from "../../types/NoteObject";
+import type { Note } from "../../types/Note";
+import type { NotesAction } from "../../hooks/useNotes";
 
-export const NotesContext = createContext<{
-    notes: NoteObject[];
-    notesActions: {
-        add: () => void;
-        remove: (id: number) => void;
-        rename: (id: number, title: string) => void;
-        updateContent: (id: number, content: string) => void;
-    };
+export type NotesContextValue = {
+    notes: Note[];
+    notesActions: NotesAction;
     lastRemoved: number | null;
-}>({
-    notes: [],
-    notesActions: {
-        add: (): void => {},
-        remove: (): void => {},
-        rename: (): void => {},
-        updateContent: (): void => {},
-    },
-    lastRemoved: null,
-});
+    renamingNoteId: number | null;
+};
+
+export const NotesContext = createContext<NotesContextValue | null>(null);

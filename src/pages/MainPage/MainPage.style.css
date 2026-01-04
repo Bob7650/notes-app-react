@@ -61,18 +61,14 @@
     gap: 16px;
 }
 
-.folders-section {
-    flex: 1;
+.folders-section,
+.notes-section {
     display: flex;
     flex-direction: column;
 
     padding-inline: 16px;
-    padding-block: 8px;
+    padding-block: 2px;
     gap: 4px;
-
-    > li {
-        list-style: none;
-    }
 }
 
 .cards-section {

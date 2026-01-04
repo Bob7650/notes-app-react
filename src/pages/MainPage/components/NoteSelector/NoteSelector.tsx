@@ -1,25 +1,22 @@
 import { useContext, useRef, useState, type MouseEvent } from "react";
 import "./NoteSelector.style.css";
 import useOutsideClick from "../../../../shared/hooks/useOutsideClick";
-import type { NoteObject } from "../../../../shared/types/NoteObject";
+import type { Note } from "../../../../shared/types/Note";
 import { NotesContext } from "../../../../shared/context/NotesContext/NotesContext";
-import Popover from "../../../../shared/components/Popover";
-import PopoverItem from "../../../../shared/components/PopoverItem";
-import type { Rect } from "../../../../shared/types/Rect";
 
 interface Props {
-    data: NoteObject;
+    data: Omit<Note, "content">;
     onMouseDown?: (
         e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>
     ) => void;
     isSelected?: boolean;
+    isRenaming?: boolean;
 }
 
 export default function NoteSelector({ data, onMouseDown, isSelected }: Props) {
-    const { notesActions } = useContext(NotesContext);
+    const { notesActions, renamingNoteId } = useContext(NotesContext)!!;
 
     const [inputValue, setInputValue] = useState<string>(data.title);
-    const [isRenaming, setRenaming] = useState(false);
 
     const noteSelectorRef = useRef<HTMLInputElement>(null);
 
@@ -29,60 +26,30 @@ export default function NoteSelector({ data, onMouseDown, isSelected }: Props) {
     };
 
     const cancelRename = () => {
-        setRenaming(false);
-    };
-
-    const startRename = () => {
-        setRenaming(true);
-    };
-
-    const [isPopoverOpen, setPopoverOpen] = useState(false);
-    const [anchor, setAnchor] = useState<Rect>({
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-    });
-
-    const handleDisplayPopover = (newAnchor: Rect) => {
-        setAnchor(newAnchor);
-        setPopoverOpen(true);
+        notesActions.setRenaming(null);
     };
 
     useOutsideClick(
         () => {
-            if (isRenaming) confirmRename();
+            if (data.id === renamingNoteId) confirmRename();
         },
         noteSelectorRef,
-        [isRenaming, confirmRename]
+        [confirmRename, renamingNoteId, data.id]
     );
 
     return (
         <>
             <div
+                ref={noteSelectorRef}
                 className={`note-selector-wrapper${
                     isSelected ? " note-selected" : ""
                 }`}
-                ref={noteSelectorRef}
                 onContextMenu={(e) => e.preventDefault()}
-                tabIndex={0}
                 onMouseDown={(e) => {
                     onMouseDown?.(e);
-                    if (e.button === 2) {
-                        handleDisplayPopover({
-                            x: e.clientX,
-                            y: e.clientY,
-                            width: 0,
-                            height: 0,
-                        });
-                        e.stopPropagation();
-                    }
                 }}
             >
-                {[...Array(data.depth)].map(() => (
-                    <span className="indent-bar">|</span>
-                ))}
-                {isRenaming ? (
+                {renamingNoteId === data.id ? (
                     <input
                         className="editable-input"
                         value={inputValue}
@@ -99,40 +66,12 @@ export default function NoteSelector({ data, onMouseDown, isSelected }: Props) {
                 ) : (
                     <span
                         className="editable-label"
-                        onDoubleClick={startRename}
+                        onDoubleClick={() => notesActions.setRenaming(data.id)}
                     >
                         {data.title}
                     </span>
                 )}
             </div>
-            <Popover
-                isOpen={isPopoverOpen}
-                anchor={anchor}
-                onClose={() => {
-                    setPopoverOpen(false);
-                }}
-            >
-                <PopoverItem
-                    actionName="Copy"
-                    iconName="content_copy"
-                    onClick={() => {}}
-                />
-                <PopoverItem
-                    actionName="Rename"
-                    iconName="edit"
-                    onClick={() => {
-                        startRename();
-                    }}
-                />
-                <PopoverItem
-                    actionName="Delete"
-                    iconName="delete"
-                    isDanger={true}
-                    onClick={() => {
-                        notesActions.remove(data.id);
-                    }}
-                />
-            </Popover>
         </>
     );
 }
