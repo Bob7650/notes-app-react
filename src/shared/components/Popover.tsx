@@ -57,7 +57,12 @@ export default function Popover({ isOpen, anchor, children, onClose }: Props) {
 
     if (!isOpen) return null;
     return createPortal(
-        <div className="popover-wrapper" ref={popoverRef} style={position}>
+        <div
+            className="popover-wrapper"
+            ref={popoverRef}
+            style={position}
+            onClick={onClose}
+        >
             {children}
         </div>,
         document.getElementById("portal")!!
