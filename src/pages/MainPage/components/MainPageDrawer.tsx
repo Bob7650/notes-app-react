@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import IconButton from "../../../shared/components/IconButton";
 import { NotesContext } from "../../../shared/context/NotesContext/NotesContext";
-import NoteSelector from "./NoteSelector/NoteSelector";
+import Selector from "./Selector/Selector";
 import { TabsContext } from "../../../shared/context/TabsContext/TabsContext";
 import Popover from "../../../shared/components/Popover";
 import PopoverItem from "../../../shared/components/PopoverItem";
@@ -49,7 +49,7 @@ export default function MainPageDrawer() {
                 <div className="folders-section"></div>
                 <div className="notes-section">
                     {notes.map((singleNote) => (
-                        <NoteSelector
+                        <Selector
                             key={singleNote.id}
                             data={singleNote}
                             isSelected={selectedCardId === singleNote.id}

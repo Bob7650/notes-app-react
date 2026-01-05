@@ -1,4 +1,4 @@
-.note-selector-wrapper {
+.selector-wrapper {
     display: flex;
     align-items: center;
     width: 100%;
@@ -12,7 +12,7 @@
     border-radius: var(--round-rad-default);
 
     &:hover,
-    &.note-selected {
+    &.selector-selected {
         background-color: var(--bg-default-hover);
     }
 }
