@@ -5,7 +5,6 @@
 
     padding-inline: 8px;
     padding-block: 4px;
-    gap: 4px;
 
     cursor: pointer;
 
@@ -15,34 +14,8 @@
     &.selector-selected {
         background-color: var(--bg-default-hover);
     }
-}
-
-.selector-active {
-    background-color: var(--bg-default-hover);
-    outline: 2px solid var(--border-default);
-    outline-offset: -2px;
-}
-
-.indent-bar {
-    width: 24px;
-    text-align: center;
-    color: var(--icon-secondary);
-}
-
-.editable-input {
-    width: 100%;
-
-    padding-inline: 0;
-    padding-block: 2px;
-
-    font-size: 1rem;
-    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-
-    outline: none;
-    border: none;
-    background-color: transparent;
-}
-
-.editable-label {
-    width: 100%;
+    &.selector-active {
+        outline: 2px solid var(--border-default);
+        outline-offset: -2px;
+    }
 }

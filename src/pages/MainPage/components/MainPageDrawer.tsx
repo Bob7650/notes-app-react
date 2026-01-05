@@ -6,9 +6,10 @@ import { TabsContext } from "../../../shared/context/TabsContext/TabsContext";
 import Popover from "../../../shared/components/Popover";
 import PopoverItem from "../../../shared/components/PopoverItem";
 import type { Rect } from "../../../shared/types/Rect";
+import EditableLabel from "../../../shared/components/EditableLabel";
 
 export default function MainPageDrawer() {
-    const { notes, notesActions } = useContext(NotesContext)!!;
+    const { notes, notesActions, renamingNoteId } = useContext(NotesContext)!!;
     const { selectedCardId, cardActions } = useContext(TabsContext);
 
     const [isPopoverOpen, setPopoverOpen] = useState(false);
@@ -28,6 +29,17 @@ export default function MainPageDrawer() {
     const handleClosePopover = () => {
         if (isPopoverOpen) setPopoverOpen(false);
     };
+
+    const handleNameChanged = (newValue: string, id: number) => {
+        notesActions.rename(id, newValue);
+        handleRenameCanceled();
+    };
+
+    const handleRenameCanceled = () => {
+        notesActions.setRenaming(null);
+    };
+
+    //const testFolder = { id: 12, title: "Siema", notes: [] };
 
     return (
         <aside className="drawer-section">
@@ -51,7 +63,6 @@ export default function MainPageDrawer() {
                     {notes.map((singleNote) => (
                         <Selector
                             key={singleNote.id}
-                            data={singleNote}
                             isSelected={selectedCardId === singleNote.id}
                             onMouseDown={(e) => {
                                 if (e.button === 0)
@@ -66,7 +77,16 @@ export default function MainPageDrawer() {
                                     });
                                 }
                             }}
-                        />
+                        >
+                            <EditableLabel
+                                initialValue={singleNote.title}
+                                canEdit={singleNote.id === renamingNoteId}
+                                onNameChanged={(newValue) =>
+                                    handleNameChanged(newValue, singleNote.id)
+                                }
+                                onRenameCanceled={handleRenameCanceled}
+                            />
+                        </Selector>
                     ))}
                 </div>
             </div>

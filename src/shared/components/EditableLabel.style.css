@@ -1,0 +1,14 @@
+.editable-input {
+    width: 100%;
+
+    font-size: 1rem;
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+    outline: none;
+    border: none;
+    background-color: transparent;
+}
+
+.editable-label {
+    width: 100%;
+}
