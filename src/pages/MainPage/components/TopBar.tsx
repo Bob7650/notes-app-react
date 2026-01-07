@@ -1,12 +1,5 @@
-import {
-    useContext,
-    useRef,
-    useState,
-    type SetStateAction,
-    type WheelEvent,
-} from "react";
+import { useContext, useRef, useState, type WheelEvent } from "react";
 import NoteCard from "./NoteCard/NoteCard";
-import { NotesContext } from "../../../shared/context/NotesContext/NotesContext";
 import {
     closestCenter,
     DndContext,
@@ -23,24 +16,12 @@ import {
     SortableContext,
 } from "@dnd-kit/sortable";
 import CardPlaceholder from "./NoteCard/CardPlaceholder";
+import { CardsContext } from "../../../shared/context/TabsContext/CardsContext";
 
-interface Props {
-    cardActions: {
-        new: (cardId: number) => void;
-        close: (cardId: number) => void;
-        set: (value: SetStateAction<number[]>) => void;
-    };
-    openedCards: number[];
-    selectedCardId: number | null;
-}
-
-export default function TopBar({
-    cardActions,
-    openedCards,
-    selectedCardId,
-}: Props) {
+export default function TopBar() {
     const mainTopBarRef = useRef<HTMLDivElement>(null);
-    const { notes } = useContext(NotesContext);
+    const { selectedCardId, openedCards, cardActions } =
+        useContext(CardsContext)!!;
     const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -60,9 +41,11 @@ export default function TopBar({
         const { active, over } = e;
 
         if (over && active.id !== over.id) {
-            cardActions.set((cards: number[]) => {
-                const oldIndex = cards.indexOf(Number(active.id));
-                const newIndex = cards.indexOf(Number(over.id));
+            cardActions.set((cards) => {
+                const oldIndex = cards.findIndex(
+                    (card) => card.id === active.id
+                );
+                const newIndex = cards.findIndex((card) => card.id === over.id);
                 return arrayMove(cards, oldIndex, newIndex);
             });
         }
@@ -100,17 +83,15 @@ export default function TopBar({
                     >
                         {openedCards.map((card) => (
                             <NoteCard
-                                key={card}
-                                id={card}
-                                title={
-                                    notes.find((note) => note.id === card)
-                                        ?.title
-                                }
-                                isSelected={selectedCardId === card}
+                                key={card.id}
+                                id={card.id}
+                                title={card.title}
+                                isSelected={selectedCardId === card.id}
                                 onClick={() => {
+                                    // Introduce switch maybe
                                     cardActions.new(card);
                                 }}
-                                onClose={() => cardActions.close(card)}
+                                onClose={() => cardActions.close(card.id)}
                             />
                         ))}
                     </SortableContext>
@@ -118,8 +99,8 @@ export default function TopBar({
                         {activeId ? (
                             <CardPlaceholder
                                 title={
-                                    notes.find(
-                                        (note) => note.id === Number(activeId)
+                                    openedCards.find(
+                                        (card) => card.id === Number(activeId)
                                     )?.title
                                 }
                             />

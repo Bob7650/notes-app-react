@@ -1,10 +1,10 @@
 import { useContext, useEffect } from "react";
-import { NotesContext } from "../context/NotesContext/NotesContext";
-import { TabsContext } from "../context/TabsContext/TabsContext";
+import { DrawerContext } from "../context/NotesContext/NotesContext";
+import { CardsContext } from "../context/TabsContext/CardsContext";
 
 export default function AppController() {
-    const { lastRemoved } = useContext(NotesContext);
-    const { cardActions } = useContext(TabsContext);
+    const { lastRemoved } = useContext(DrawerContext);
+    const { cardActions } = useContext(CardsContext);
 
     useEffect(() => {
         if (!lastRemoved) return;

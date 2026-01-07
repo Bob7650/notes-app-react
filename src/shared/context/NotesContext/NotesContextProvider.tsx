@@ -1,17 +1,17 @@
 import { type ReactNode } from "react";
-import { NotesContext } from "./NotesContext";
-import { useNotes } from "../../hooks/useNotes";
+import { DrawerContext } from "./NotesContext";
+import { useDrawer } from "../../hooks/useDrawer";
 
 export default function NotesContextProvider({
     children,
 }: {
     children: ReactNode;
 }) {
-    const notesState = useNotes();
+    const notesState = useDrawer();
 
     return (
-        <NotesContext.Provider value={notesState}>
+        <DrawerContext.Provider value={notesState}>
             {children}
-        </NotesContext.Provider>
+        </DrawerContext.Provider>
     );
 }

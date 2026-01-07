@@ -1,16 +1,17 @@
 import { useContext, useState } from "react";
 import IconButton from "../../../shared/components/IconButton";
-import { NotesContext } from "../../../shared/context/NotesContext/NotesContext";
+import { DrawerContext } from "../../../shared/context/NotesContext/NotesContext";
 import Selector from "./Selector/Selector";
-import { TabsContext } from "../../../shared/context/TabsContext/TabsContext";
+import { CardsContext } from "../../../shared/context/TabsContext/CardsContext";
 import Popover from "../../../shared/components/Popover";
 import PopoverItem from "../../../shared/components/PopoverItem";
 import type { Rect } from "../../../shared/types/Rect";
 import EditableLabel from "../../../shared/components/EditableLabel";
 
 export default function MainPageDrawer() {
-    const { notes, notesActions, renamingNoteId } = useContext(NotesContext)!!;
-    const { selectedCardId, cardActions } = useContext(TabsContext);
+    const { notes, folders, drawerActions, renamingNoteId } =
+        useContext(DrawerContext)!;
+    const { selectedCardId, cardActions } = useContext(CardsContext)!;
 
     const [isPopoverOpen, setPopoverOpen] = useState(false);
     const [popoverCallerId, setPopoverCallerId] = useState<number | null>(null);
@@ -21,7 +22,8 @@ export default function MainPageDrawer() {
         height: 0,
     });
 
-    const handleDisplayPopover = (newAnchor: Rect) => {
+    const handleDisplayPopover = (newAnchor: Rect, callerId: number) => {
+        setPopoverCallerId(callerId);
         setAnchor(newAnchor);
         setPopoverOpen(true);
     };
@@ -31,15 +33,13 @@ export default function MainPageDrawer() {
     };
 
     const handleNameChanged = (newValue: string, id: number) => {
-        notesActions.rename(id, newValue);
+        drawerActions.renameEntry(id, newValue);
         handleRenameCanceled();
     };
 
     const handleRenameCanceled = () => {
-        notesActions.setRenaming(null);
+        drawerActions.setEntryRenaming(null);
     };
-
-    const testFolder = { id: 12, title: "Siema", notes: [] };
 
     return (
         <aside className="drawer-section">
@@ -52,51 +52,112 @@ export default function MainPageDrawer() {
                     <IconButton
                         iconName="edit_square"
                         onClick={() => {
-                            notesActions.add();
+                            drawerActions.addNote();
                         }}
                     />
-                    <IconButton iconName="create_new_folder" />
+                    <IconButton
+                        iconName="create_new_folder"
+                        onClick={() => {
+                            drawerActions.addFolder();
+                        }}
+                    />
                     <IconButton iconName="sort_by_alpha" />
                 </div>
                 <div className="folders-section">
-                    <Selector
-                        key={testFolder.id}
-                        isSelected={selectedCardId === testFolder.id}
-                        onMouseDown={(e) => {
-                            if (e.button === 0) {
-                                // Expand/Hide notes
-                            }
-                            if (e.button === 2) {
-                                setPopoverCallerId(testFolder.id);
-                                handleDisplayPopover({
-                                    x: e.clientX,
-                                    y: e.clientY,
-                                    width: 0,
-                                    height: 0,
-                                });
-                            }
-                        }}
-                    >
-                        {/* This is temporary, change in the future */}
-                        <span
-                            className="material-symbols-outlined"
-                            style={{
-                                position: "relative",
-                                top: 1,
-                                left: -3,
-                            }}
-                        >
-                            chevron_right
-                        </span>
-                        <EditableLabel
-                            initialValue={testFolder.title}
-                            canEdit={testFolder.id === renamingNoteId}
-                            onNameChanged={(newValue) =>
-                                handleNameChanged(newValue, testFolder.id)
-                            }
-                            onRenameCanceled={handleRenameCanceled}
-                        />
-                    </Selector>
+                    {folders.map((folder) => (
+                        <div key={folder.id}>
+                            <Selector
+                                isSelected={selectedCardId === folder.id}
+                                onMouseDown={(e) => {
+                                    if (e.button === 0) {
+                                        drawerActions.setFolderExpanded(
+                                            folder.id,
+                                            !folder.expanded
+                                        );
+                                    }
+                                    if (e.button === 2) {
+                                        handleDisplayPopover(
+                                            {
+                                                x: e.clientX,
+                                                y: e.clientY,
+                                                width: 0,
+                                                height: 0,
+                                            },
+                                            folder.id
+                                        );
+                                    }
+                                }}
+                            >
+                                {/* This is temporary, change in the future */}
+                                <span
+                                    className="material-symbols-outlined"
+                                    style={{
+                                        position: "relative",
+                                        top: 1,
+                                        left: -3,
+                                    }}
+                                >
+                                    {folder.expanded
+                                        ? "arrow_drop_down"
+                                        : "arrow_right"}
+                                </span>
+                                <EditableLabel
+                                    initialValue={folder.title}
+                                    canEdit={folder.id === renamingNoteId}
+                                    onNameChanged={(newValue) =>
+                                        handleNameChanged(newValue, folder.id)
+                                    }
+                                    onRenameCanceled={handleRenameCanceled}
+                                />
+                            </Selector>
+                            {folder.expanded
+                                ? folder.notes.map((note) => (
+                                      <Selector
+                                          key={note.id}
+                                          isSelected={
+                                              selectedCardId === note.id
+                                          }
+                                          onMouseDown={(e) => {
+                                              if (e.button === 0)
+                                                  cardActions.new({
+                                                      id: note.id,
+                                                      title: note.title,
+                                                  });
+                                              if (e.button === 2) {
+                                                  handleDisplayPopover(
+                                                      {
+                                                          x: e.clientX,
+                                                          y: e.clientY,
+                                                          width: 0,
+                                                          height: 0,
+                                                      },
+                                                      note.id
+                                                  );
+                                              }
+                                          }}
+                                      >
+                                          <div style={{ marginLeft: 24 }}>
+                                              <EditableLabel
+                                                  initialValue={note.title}
+                                                  canEdit={
+                                                      note.id === renamingNoteId
+                                                  }
+                                                  onNameChanged={(newValue) =>
+                                                      handleNameChanged(
+                                                          newValue,
+                                                          note.id
+                                                      )
+                                                  }
+                                                  onRenameCanceled={
+                                                      handleRenameCanceled
+                                                  }
+                                              />
+                                          </div>
+                                      </Selector>
+                                  ))
+                                : null}
+                        </div>
+                    ))}
                 </div>
                 <div className="notes-section">
                     {notes.map((singleNote) => (
@@ -105,15 +166,20 @@ export default function MainPageDrawer() {
                             isSelected={selectedCardId === singleNote.id}
                             onMouseDown={(e) => {
                                 if (e.button === 0)
-                                    cardActions.new(singleNote.id);
-                                if (e.button === 2) {
-                                    setPopoverCallerId(singleNote.id);
-                                    handleDisplayPopover({
-                                        x: e.clientX,
-                                        y: e.clientY,
-                                        width: 0,
-                                        height: 0,
+                                    cardActions.new({
+                                        id: singleNote.id,
+                                        title: singleNote.title,
                                     });
+                                if (e.button === 2) {
+                                    handleDisplayPopover(
+                                        {
+                                            x: e.clientX,
+                                            y: e.clientY,
+                                            width: 0,
+                                            height: 0,
+                                        },
+                                        singleNote.id
+                                    );
                                 }
                             }}
                         >
@@ -143,7 +209,7 @@ export default function MainPageDrawer() {
                     actionName="Rename"
                     iconName="edit"
                     onClick={() => {
-                        notesActions.setRenaming(popoverCallerId);
+                        drawerActions.setEntryRenaming(popoverCallerId);
                     }}
                 />
                 <PopoverItem
@@ -151,7 +217,7 @@ export default function MainPageDrawer() {
                     iconName="delete"
                     isDanger={true}
                     onClick={() => {
-                        notesActions.remove(popoverCallerId);
+                        drawerActions.removeEntry(popoverCallerId);
                     }}
                 />
             </Popover>

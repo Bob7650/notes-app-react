@@ -1,12 +1,14 @@
 import { createContext } from "react";
 import type { Note } from "../../types/Note";
-import type { NotesAction } from "../../hooks/useNotes";
+import type { DrawerAction } from "../../hooks/useDrawer";
+import type { Folder } from "../../types/Folder";
 
-export type NotesContextValue = {
+export type DrawerContextValue = {
     notes: Note[];
-    notesActions: NotesAction;
+    folders: Folder[];
+    drawerActions: DrawerAction;
     lastRemoved: number | null;
     renamingNoteId: number | null;
 };
 
-export const NotesContext = createContext<NotesContextValue | null>(null);
+export const DrawerContext = createContext<DrawerContextValue | null>(null);

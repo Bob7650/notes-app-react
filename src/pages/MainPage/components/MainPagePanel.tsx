@@ -1,22 +1,17 @@
 import { useContext } from "react";
 import IconButton from "../../../shared/components/IconButton";
 import TextEditor from "./TextEditor/TextEditor";
-import { NotesContext } from "../../../shared/context/NotesContext/NotesContext";
+import { DrawerContext } from "../../../shared/context/NotesContext/NotesContext";
 import TopBar from "./TopBar";
-import { TabsContext } from "../../../shared/context/TabsContext/TabsContext";
+import { CardsContext } from "../../../shared/context/TabsContext/CardsContext";
 
 export default function MainPagePanel() {
-    const { notes, notesActions } = useContext(NotesContext)!!;
-    const { selectedCardId, openedCards, cardActions } =
-        useContext(TabsContext);
+    const { notes, drawerActions: notesActions } = useContext(DrawerContext)!!;
+    const { selectedCardId } = useContext(CardsContext)!!;
 
     return (
         <div className="main-panel-section">
-            <TopBar
-                cardActions={cardActions}
-                openedCards={openedCards}
-                selectedCardId={selectedCardId}
-            />
+            <TopBar />
             <div className="note-tools-section bordered">
                 <div className="tools-section">
                     <div className="arrow-container">
@@ -35,7 +30,7 @@ export default function MainPagePanel() {
                             }
                             onChange={() => {}}
                             onChangeDebounce={(updatedContent) =>
-                                notesActions.updateContent(
+                                notesActions.updateNoteContent(
                                     selectedCardId ?? -1,
                                     updatedContent
                                 )
