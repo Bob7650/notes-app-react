@@ -39,7 +39,7 @@ export default function MainPageDrawer() {
         notesActions.setRenaming(null);
     };
 
-    //const testFolder = { id: 12, title: "Siema", notes: [] };
+    const testFolder = { id: 12, title: "Siema", notes: [] };
 
     return (
         <aside className="drawer-section">
@@ -58,7 +58,46 @@ export default function MainPageDrawer() {
                     <IconButton iconName="create_new_folder" />
                     <IconButton iconName="sort_by_alpha" />
                 </div>
-                <div className="folders-section"></div>
+                <div className="folders-section">
+                    <Selector
+                        key={testFolder.id}
+                        isSelected={selectedCardId === testFolder.id}
+                        onMouseDown={(e) => {
+                            if (e.button === 0) {
+                                // Expand/Hide notes
+                            }
+                            if (e.button === 2) {
+                                setPopoverCallerId(testFolder.id);
+                                handleDisplayPopover({
+                                    x: e.clientX,
+                                    y: e.clientY,
+                                    width: 0,
+                                    height: 0,
+                                });
+                            }
+                        }}
+                    >
+                        {/* This is temporary, change in the future */}
+                        <span
+                            className="material-symbols-outlined"
+                            style={{
+                                position: "relative",
+                                top: 1,
+                                left: -3,
+                            }}
+                        >
+                            chevron_right
+                        </span>
+                        <EditableLabel
+                            initialValue={testFolder.title}
+                            canEdit={testFolder.id === renamingNoteId}
+                            onNameChanged={(newValue) =>
+                                handleNameChanged(newValue, testFolder.id)
+                            }
+                            onRenameCanceled={handleRenameCanceled}
+                        />
+                    </Selector>
+                </div>
                 <div className="notes-section">
                     {notes.map((singleNote) => (
                         <Selector
