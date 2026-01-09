@@ -8,7 +8,6 @@ import {
     useSensor,
     useSensors,
     type DragEndEvent,
-    type UniqueIdentifier,
 } from "@dnd-kit/core";
 import {
     arrayMove,
@@ -17,12 +16,14 @@ import {
 } from "@dnd-kit/sortable";
 import CardPlaceholder from "./NoteCard/CardPlaceholder";
 import { CardsContext } from "../../../shared/context/TabsContext/CardsContext";
+import { DrawerContext } from "../../../shared/context/NotesContext/NotesContext";
 
 export default function TopBar() {
     const mainTopBarRef = useRef<HTMLDivElement>(null);
-    const { selectedCardId, openedCards, cardActions } =
+    const { selectedCardId, cardActions, openedCards } =
         useContext(CardsContext)!!;
-    const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+    const { drawerItemsById } = useContext(DrawerContext)!;
+    const [activeId, setActiveId] = useState<number | null>(null);
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
@@ -34,7 +35,7 @@ export default function TopBar() {
     const handleDragStart = (e: DragEndEvent) => {
         const { active } = e;
 
-        setActiveId(active.id);
+        setActiveId(active.id as number);
     };
 
     const handleDragEnd = (e: DragEndEvent) => {
@@ -99,9 +100,9 @@ export default function TopBar() {
                         {activeId ? (
                             <CardPlaceholder
                                 title={
-                                    openedCards.find(
-                                        (card) => card.id === Number(activeId)
-                                    )?.title
+                                    selectedCardId
+                                        ? drawerItemsById[activeId].title
+                                        : ""
                                 }
                             />
                         ) : null}
