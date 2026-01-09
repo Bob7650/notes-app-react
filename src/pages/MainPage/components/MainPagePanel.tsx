@@ -6,8 +6,8 @@ import TopBar from "./TopBar";
 import { CardsContext } from "../../../shared/context/TabsContext/CardsContext";
 
 export default function MainPagePanel() {
-    const { notes, drawerActions: notesActions } = useContext(DrawerContext)!!;
-    const { selectedCardId } = useContext(CardsContext)!!;
+    const { drawerActions, contentById } = useContext(DrawerContext)!;
+    const { selectedCardId } = useContext(CardsContext)!;
 
     return (
         <div className="main-panel-section">
@@ -22,19 +22,21 @@ export default function MainPagePanel() {
                 </div>
                 <div className="note-section">
                     <div className="editor-wrapper">
+                        {/* TODO: Render Text Editor only when any card is selected */}
                         <TextEditor
                             noteId={selectedCardId ? selectedCardId : -1}
                             initialValue={
-                                notes.find((note) => note.id === selectedCardId)
-                                    ?.content ?? ""
+                                selectedCardId
+                                    ? contentById[selectedCardId]
+                                    : ""
                             }
                             onChange={() => {}}
-                            onChangeDebounce={(updatedContent) =>
-                                notesActions.updateNoteContent(
-                                    selectedCardId ?? -1,
+                            onChangeDebounce={(updatedContent) => {
+                                drawerActions.updateNoteContent(
+                                    selectedCardId,
                                     updatedContent
-                                )
-                            }
+                                );
+                            }}
                         />
                     </div>
                 </div>

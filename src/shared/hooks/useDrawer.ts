@@ -5,94 +5,62 @@ import {
     type Dispatch,
     type SetStateAction,
 } from "react";
-import type { Note } from "../types/Note";
-import type { Folder } from "../types/Folder";
+import type { DrawerItem } from "../types/DrawerItem";
+
+const DRAWER_ITEMS_STORAGE_ID = "drawer_items";
 
 const createDrawerActions = (
-    setNotes: Dispatch<SetStateAction<Note[]>>,
-    setFolders: Dispatch<SetStateAction<Folder[]>>,
+    setDrawerItems: Dispatch<SetStateAction<DrawerItem[]>>,
     setLastRemoved: Dispatch<SetStateAction<number | null>>,
     setRenamingId: Dispatch<SetStateAction<number | null>>
 ) => ({
-    addNote: (): void => {
-        setNotes((prevState) => [
+    addItem: (type: "folder" | "note"): void => {
+        setDrawerItems((prevState) => [
             ...prevState,
             {
                 id: Date.now(),
-                title: "Untitled",
-                content: "",
-                isRenaming: false,
+                title: type,
+                parentId: "root",
+                isFolder: type === "folder",
+                content: type === "note" ? "" : undefined,
             },
         ]);
     },
-    updateNoteContent: (id: number, content: string): void => {
-        setNotes((prevState) =>
+    updateNoteContent: (noteId: number | null, content: string): void => {
+        setDrawerItems((prevState) =>
             prevState.map((note) =>
-                note.id === id ? { ...note, content: content } : note
+                note.id === noteId && !note.isFolder
+                    ? {
+                          ...note,
+                          content: content,
+                      }
+                    : note
             )
         );
     },
-    addFolder: (): void => {
-        setFolders((prevState) => [
-            ...prevState,
-            {
-                id: Date.now(),
-                title: "Untitled",
-                expanded: false,
-                notes: [
-                    {
-                        id: 1234,
-                        title: "Untitled",
-                        content: "",
-                        isRenaming: false,
-                    },
-                ],
-            },
-        ]);
+    addFolderChild: (folderId: number, noteId: number): void => {
+        // TODO: implement function
     },
-    addFolderChild: (id: number, notes: Note[]): void => {
-        setFolders((prevState) =>
-            prevState.map((folder) =>
-                folder.id === id
-                    ? { ...folder, notes: [...folder.notes, ...notes] }
-                    : folder
-            )
-        );
+    setFolderChildren: (folderId: number, noteId: number): void => {
+        // TODO: implement function
     },
-    setFolderChildren: (id: number, notes: Note[]): void => {
-        setFolders((prevState) =>
-            prevState.map((folder) =>
-                folder.id === id ? { ...folder, notes: notes } : folder
-            )
-        );
-    },
-    setFolderExpanded: (id: number, expanded: boolean): void => {
-        setFolders((prevState) =>
-            prevState.map((folder) =>
-                folder.id === id ? { ...folder, expanded: expanded } : folder
-            )
-        );
-    },
-    removeEntry: (id: number | null) => {
-        setNotes((prevState) => prevState.filter((note) => note.id !== id));
-        setFolders((prevState) =>
-            prevState.filter((folder) => folder.id !== id)
+    removeEntry: (id: number) => {
+        setDrawerItems((prevState) =>
+            prevState.filter((item) => item.id !== id)
         );
         // Instead of this can send event, maybe chackout in the future
         setLastRemoved(id);
     },
-    setEntryRenaming: (id: number | null) => {
+    setEntryRenaming: (id: number) => {
         setRenamingId(id);
     },
+    cancelEntryRenaming: () => {
+        setRenamingId(null);
+    },
     renameEntry: (id: number, title: string): void => {
-        setNotes((prevState) =>
-            prevState.map((note) =>
-                note.id === id ? { ...note, title: title } : note
-            )
-        );
-        setFolders((prevState) =>
-            prevState.map((folder) =>
-                folder.id === id ? { ...folder, title: title } : folder
+        setDrawerItems((prevState) =>
+            prevState.map((item) =>
+                item.id === id ? { ...item, title: title } : item
             )
         );
     },
@@ -101,48 +69,76 @@ const createDrawerActions = (
 export type DrawerAction = ReturnType<typeof createDrawerActions>;
 
 export function useDrawer() {
-    const initialNotesState = (): Note[] => {
-        const savedNotes = localStorage.getItem("notes");
+    const initialItemsState = (): DrawerItem[] => {
+        const savedItems = localStorage.getItem(DRAWER_ITEMS_STORAGE_ID);
         try {
-            return JSON.parse(savedNotes ?? "[]");
+            return JSON.parse(savedItems ?? "[]");
         } catch (error) {
             console.error(error);
             return [];
         }
     };
 
-    const initialFolderState = (): Folder[] => {
-        const savedFolders = localStorage.getItem("folders");
-        try {
-            return JSON.parse(savedFolders ?? "[]");
-        } catch (error) {
-            console.error(error);
-            return [];
-        }
-    };
+    const [drawerItems, setDrawerItems] =
+        useState<DrawerItem[]>(initialItemsState);
 
-    const [notes, setNotes] = useState<Note[]>(initialNotesState);
-    const [folders, setFolders] = useState<Folder[]>(initialFolderState);
-    const [lastRemoved, setLastRemoved] = useState<number | null>(null);
-    const [renamingNoteId, setRenamingNoteId] = useState<number | null>(null);
+    const [lastRemovedId, setLastRemovedId] = useState<number | null>(null);
+    const [renamingId, setRenamingId] = useState<number | null>(null);
+
     const drawerActions = useMemo(
         () =>
             createDrawerActions(
-                setNotes,
-                setFolders,
-                setLastRemoved,
-                setRenamingNoteId
+                setDrawerItems,
+                setLastRemovedId,
+                setRenamingId
             ),
         []
     );
 
-    useEffect(() => {
-        localStorage.setItem("notes", JSON.stringify(notes));
-    }, [notes]);
+    const contentById = useMemo(() => {
+        const record: Record<number, string> = {};
+
+        drawerItems.forEach((item) => {
+            if (item.content) record[item.id] = item.content;
+        });
+
+        return record;
+    }, [drawerItems]);
+
+    const drawerItemsById = useMemo(() => {
+        const record: Record<number, DrawerItem> = {};
+
+        drawerItems.forEach((item) => {
+            record[item.id] = item;
+        });
+
+        return record;
+    }, [drawerItems]);
+
+    const drawerMap = useMemo(() => {
+        const map: Map<number | "root", DrawerItem[]> = new Map();
+
+        drawerItems.forEach((item) => {
+            const key = item.parentId;
+            map.set(key, [...(map.get(key) || []), item]);
+        });
+
+        return map;
+    }, [drawerItems]);
 
     useEffect(() => {
-        localStorage.setItem("folders", JSON.stringify(folders));
-    }, [folders]);
+        localStorage.setItem(
+            DRAWER_ITEMS_STORAGE_ID,
+            JSON.stringify(drawerItems)
+        );
+    }, [drawerItems]);
 
-    return { notes, folders, drawerActions, lastRemoved, renamingNoteId };
+    return {
+        drawerMap,
+        contentById,
+        drawerItemsById,
+        drawerActions,
+        lastRemovedId,
+        renamingId,
+    };
 }
