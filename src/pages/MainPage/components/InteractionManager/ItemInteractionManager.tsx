@@ -1,15 +1,19 @@
 import { type MouseEvent, type ReactNode } from "react";
-import "./Selector.style.css";
+import "./ItemInteractionManager.style.css";
 
 interface Props {
     onMouseDown?: (
-        e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>
+        e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
     ) => void;
     children: ReactNode;
     isSelected?: boolean;
 }
 
-export default function Selector({ onMouseDown, children, isSelected }: Props) {
+export default function ItemInteractionManager({
+    onMouseDown,
+    children,
+    isSelected,
+}: Props) {
     return (
         <>
             <div

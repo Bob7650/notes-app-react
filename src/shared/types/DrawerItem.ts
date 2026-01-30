@@ -3,5 +3,6 @@ export type DrawerItem = {
     title: string;
     parentId: number | "root";
     isFolder: boolean;
+    isExpanded?: boolean;
     content?: string;
 };

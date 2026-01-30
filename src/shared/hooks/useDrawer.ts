@@ -12,7 +12,7 @@ const DRAWER_ITEMS_STORAGE_ID = "drawer_items";
 const createDrawerActions = (
     setDrawerItems: Dispatch<SetStateAction<DrawerItem[]>>,
     setLastRemoved: Dispatch<SetStateAction<number | null>>,
-    setRenamingId: Dispatch<SetStateAction<number | null>>
+    setRenamingId: Dispatch<SetStateAction<number | null>>,
 ) => ({
     addItem: (type: "folder" | "note"): void => {
         setDrawerItems((prevState) => [
@@ -22,6 +22,7 @@ const createDrawerActions = (
                 title: type,
                 parentId: "root",
                 isFolder: type === "folder",
+                isExpanded: type === "folder" ? false : undefined,
                 content: type === "note" ? "" : undefined,
             },
         ]);
@@ -34,8 +35,20 @@ const createDrawerActions = (
                           ...note,
                           content: content,
                       }
-                    : note
-            )
+                    : note,
+            ),
+        );
+    },
+    expandFolder: (folderId: number): void => {
+        setDrawerItems((prevState) =>
+            prevState.map((folder) =>
+                folder.id === folderId && folder.isFolder
+                    ? {
+                          ...folder,
+                          isExpanded: !folder.isExpanded,
+                      }
+                    : folder,
+            ),
         );
     },
     addFolderChild: (folderId: number, noteId: number): void => {
@@ -46,7 +59,7 @@ const createDrawerActions = (
     },
     removeEntry: (id: number) => {
         setDrawerItems((prevState) =>
-            prevState.filter((item) => item.id !== id)
+            prevState.filter((item) => item.id !== id),
         );
         // Instead of this can send event, maybe chackout in the future
         setLastRemoved(id);
@@ -60,8 +73,8 @@ const createDrawerActions = (
     renameEntry: (id: number, title: string): void => {
         setDrawerItems((prevState) =>
             prevState.map((item) =>
-                item.id === id ? { ...item, title: title } : item
-            )
+                item.id === id ? { ...item, title: title } : item,
+            ),
         );
     },
 });
@@ -90,9 +103,9 @@ export function useDrawer() {
             createDrawerActions(
                 setDrawerItems,
                 setLastRemovedId,
-                setRenamingId
+                setRenamingId,
             ),
-        []
+        [],
     );
 
     const contentById = useMemo(() => {
@@ -129,7 +142,7 @@ export function useDrawer() {
     useEffect(() => {
         localStorage.setItem(
             DRAWER_ITEMS_STORAGE_ID,
-            JSON.stringify(drawerItems)
+            JSON.stringify(drawerItems),
         );
     }, [drawerItems]);
 
