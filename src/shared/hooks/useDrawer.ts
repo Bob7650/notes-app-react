@@ -1,157 +1,120 @@
-import {
-    useEffect,
-    useMemo,
-    useState,
-    type Dispatch,
-    type SetStateAction,
-} from "react";
-import type { DrawerItem } from "../types/DrawerItem";
+import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
+import type { DrawerFile } from "../types/DrawerFile";
+import type { DrawerFolder } from "../types/DrawerFolder";
 
-const DRAWER_ITEMS_STORAGE_ID = "drawer_items";
-
-const createDrawerActions = (
-    setDrawerItems: Dispatch<SetStateAction<DrawerItem[]>>,
-    setLastRemoved: Dispatch<SetStateAction<number | null>>,
-    setRenamingId: Dispatch<SetStateAction<number | null>>,
+const createSharedActions = (
+    setDrawerItems: Dispatch<SetStateAction<(DrawerFile | DrawerFolder)[]>>,
+    setEditableId: Dispatch<SetStateAction<string | null>>,
 ) => ({
-    addItem: (type: "folder" | "note"): void => {
+    add: (type: "folder" | "note"): void => {
+        const defaultFolder: DrawerFolder = {
+            id: String(Date.now()),
+            title: type,
+            parentId: "root",
+            isExpanded: false,
+        };
+
+        const defaultFile: DrawerFile = {
+            id: String(Date.now()),
+            title: type,
+            parentId: "root",
+        };
+
         setDrawerItems((prevState) => [
             ...prevState,
-            {
-                id: Date.now(),
-                title: type,
-                parentId: "root",
-                isFolder: type === "folder",
-                isExpanded: type === "folder" ? false : undefined,
-                content: type === "note" ? "" : undefined,
-            },
+            type === "folder" ? defaultFolder : defaultFile,
         ]);
     },
-    updateNoteContent: (noteId: number | null, content: string): void => {
-        setDrawerItems((prevState) =>
-            prevState.map((note) =>
-                note.id === noteId && !note.isFolder
-                    ? {
-                          ...note,
-                          content: content,
-                      }
-                    : note,
-            ),
-        );
-    },
-    expandFolder: (folderId: number): void => {
-        setDrawerItems((prevState) =>
-            prevState.map((folder) =>
-                folder.id === folderId && folder.isFolder
-                    ? {
-                          ...folder,
-                          isExpanded: !folder.isExpanded,
-                      }
-                    : folder,
-            ),
-        );
-    },
-    addFolderChild: (folderId: number, noteId: number): void => {
-        // TODO: implement function
-    },
-    setFolderChildren: (folderId: number, noteId: number): void => {
-        // TODO: implement function
-    },
-    removeEntry: (id: number) => {
+    removeById: (id: string) => {
         setDrawerItems((prevState) =>
             prevState.filter((item) => item.id !== id),
         );
-        // Instead of this can send event, maybe chackout in the future
-        setLastRemoved(id);
+        //setLastRemoved(id);
     },
-    setEntryRenaming: (id: number) => {
-        setRenamingId(id);
-    },
-    cancelEntryRenaming: () => {
-        setRenamingId(null);
-    },
-    renameEntry: (id: number, title: string): void => {
+    renameById: (id: string, title: string): void => {
         setDrawerItems((prevState) =>
             prevState.map((item) =>
                 item.id === id ? { ...item, title: title } : item,
             ),
         );
     },
+    makeEditable: (id: string) => {
+        setEditableId(id);
+    },
+    makeStatic: () => {
+        setEditableId(null);
+    },
 });
 
-export type DrawerAction = ReturnType<typeof createDrawerActions>;
+const createFolderActions = (
+    setDrawerItems: Dispatch<SetStateAction<(DrawerFile | DrawerFolder)[]>>,
+) => ({
+    expandFolder: (id: string): void => {
+        setDrawerItems((prevState) =>
+            prevState.map((item) =>
+                item.id === id && "isExpanded" in item
+                    ? { ...item, isExpanded: !item.isExpanded }
+                    : item,
+            ),
+        );
+    },
+});
+
+const createPopoverActions = (
+    sharedActions: ReturnType<typeof createSharedActions>,
+) => ({
+    removeById: (id: string): void => {
+        sharedActions.removeById(id);
+    },
+    copy: (id: string): void => {
+        // TODO: implement
+    },
+    makeEditable: (id: string): void => {
+        sharedActions.makeEditable(id);
+    },
+});
+
+export type DrawerAction = ReturnType<typeof createSharedActions>;
 
 export function useDrawer() {
-    const initialItemsState = (): DrawerItem[] => {
-        const savedItems = localStorage.getItem(DRAWER_ITEMS_STORAGE_ID);
-        try {
-            return JSON.parse(savedItems ?? "[]");
-        } catch (error) {
-            console.error(error);
-            return [];
-        }
-    };
+    const [drawerItems, setDrawerItems] = useState<
+        (DrawerFile | DrawerFolder)[]
+    >([]);
 
-    const [drawerItems, setDrawerItems] =
-        useState<DrawerItem[]>(initialItemsState);
-
-    const [lastRemovedId, setLastRemovedId] = useState<number | null>(null);
-    const [renamingId, setRenamingId] = useState<number | null>(null);
-
-    const drawerActions = useMemo(
-        () =>
-            createDrawerActions(
-                setDrawerItems,
-                setLastRemovedId,
-                setRenamingId,
-            ),
-        [],
-    );
-
-    const contentById = useMemo(() => {
-        const record: Record<number, string> = {};
+    const childrenById = useMemo(() => {
+        const map: Map<string, (DrawerFile | DrawerFolder)[]> = new Map();
 
         drawerItems.forEach((item) => {
-            if (item.content) record[item.id] = item.content;
-        });
-
-        return record;
-    }, [drawerItems]);
-
-    const drawerItemsById = useMemo(() => {
-        const record: Record<number, DrawerItem> = {};
-
-        drawerItems.forEach((item) => {
-            record[item.id] = item;
-        });
-
-        return record;
-    }, [drawerItems]);
-
-    const drawerMap = useMemo(() => {
-        const map: Map<number | "root", DrawerItem[]> = new Map();
-
-        drawerItems.forEach((item) => {
-            const key = item.parentId;
-            map.set(key, [...(map.get(key) || []), item]);
+            const parentId = item.parentId;
+            map.set(parentId, [...(map.get(parentId) || []), item]);
         });
 
         return map;
     }, [drawerItems]);
 
-    useEffect(() => {
-        localStorage.setItem(
-            DRAWER_ITEMS_STORAGE_ID,
-            JSON.stringify(drawerItems),
-        );
-    }, [drawerItems]);
+    //const [lastRemovedId, setLastRemovedId] = useState<number | null>(null);
+    const [renamingId, setRenamingId] = useState<string | null>(null);
+
+    const sharedActions = useMemo(
+        () => createSharedActions(setDrawerItems, setRenamingId),
+        [],
+    );
+
+    const folderActions = useMemo(
+        () => createFolderActions(setDrawerItems),
+        [],
+    );
+
+    const popoverActions = useMemo(
+        () => createPopoverActions(sharedActions),
+        [],
+    );
 
     return {
-        drawerMap,
-        contentById,
-        drawerItemsById,
-        drawerActions,
-        lastRemovedId,
+        sharedActions,
+        folderActions,
+        popoverActions,
+        childrenById,
         renamingId,
     };
 }
