@@ -29,7 +29,7 @@ export default function FolderManager({ startFrom, onCallPopover }: Props) {
             {drawerMap.get(startFrom)?.map((root) => (
                 <div key={root.id} className="drawer-item-wrapper">
                     <ItemInteractionManager
-                        isSelected={selectedCardId === root.id}
+                        itemId={root.id}
                         onMouseDown={(e) => {
                             if (e.button === 0) {
                                 if (!root.isFolder) {
@@ -39,9 +39,6 @@ export default function FolderManager({ startFrom, onCallPopover }: Props) {
                                     });
                                 } else {
                                     drawerActions.expandFolder(root.id);
-                                    console.log(
-                                        `Expanded folder id: ${root.id}`,
-                                    );
                                 }
                             }
 

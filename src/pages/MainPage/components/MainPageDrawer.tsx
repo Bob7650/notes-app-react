@@ -5,6 +5,13 @@ import Popover from "../../../shared/components/Popover";
 import PopoverItem from "../../../shared/components/PopoverItem";
 import type { Rect } from "../../../shared/types/Rect";
 import FolderManager from "./FolderManager/FolderManager";
+import {
+    DndContext,
+    DragOverlay,
+    PointerSensor,
+    useSensor,
+    useSensors,
+} from "@dnd-kit/core";
 
 export default function MainPageDrawer() {
     const { drawerActions } = useContext(DrawerContext)!;
@@ -27,6 +34,14 @@ export default function MainPageDrawer() {
     const handleClosePopover = () => {
         if (isPopoverOpen) setPopoverOpen(false);
     };
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 10,
+            },
+        }),
+    );
 
     return (
         <aside className="drawer-section">
@@ -51,10 +66,13 @@ export default function MainPageDrawer() {
                     <IconButton iconName="sort_by_alpha" />
                 </div>
                 <div className="folders-section">
-                    <FolderManager
-                        startFrom="root"
-                        onCallPopover={handleDisplayPopover}
-                    />
+                    <DndContext sensors={sensors}>
+                        <FolderManager
+                            startFrom="root"
+                            onCallPopover={handleDisplayPopover}
+                        />
+                        <DragOverlay>Hello</DragOverlay>
+                    </DndContext>
                 </div>
             </div>
 
