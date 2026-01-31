@@ -1,0 +1,21 @@
+.selector-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    padding-inline: 8px;
+    padding-block: 4px;
+
+    cursor: pointer;
+
+    border-radius: var(--round-rad-default);
+
+    &:hover,
+    &.selector-selected {
+        background-color: var(--bg-default-hover);
+    }
+    &.selector-active {
+        outline: 2px solid var(--border-default);
+        outline-offset: -2px;
+    }
+}
