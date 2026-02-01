@@ -53,6 +53,13 @@ const createFileActions = (
             ),
         );
     },
+    setParent: (id: string, parentId: string): void => {
+        setDrawerItems((prevState) =>
+            prevState.map((item) =>
+                item.id === id ? { ...item, parentId: parentId } : item,
+            ),
+        );
+    },
 });
 
 export function useFiles() {
