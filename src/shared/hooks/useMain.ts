@@ -1,16 +1,8 @@
-import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 
 const createMainActions = (
     setOpenedFilesId: Dispatch<SetStateAction<string[]>>,
     setSelectedFileId: Dispatch<SetStateAction<string | null>>,
-    setFilesContents: Dispatch<
-        SetStateAction<
-            {
-                id: string;
-                content: string;
-            }[]
-        >
-    >,
     selectedFileId: string | null,
     openedFiles: string[],
 ) => ({
@@ -48,44 +40,21 @@ const createMainActions = (
             prevState.filter((openedId) => openedId !== fileId),
         );
     },
-    updateContent: (id: string, content: string): void => {
-        setFilesContents((prevState) =>
-            prevState.map((fileContent) =>
-                fileContent.id === id
-                    ? { ...fileContent, content: content }
-                    : fileContent,
-            ),
-        );
-    },
 });
 
 export type CardAction = ReturnType<typeof createMainActions>;
 
 export default function useMain() {
     const [openedFiles, setOpenedFilesId] = useState<string[]>([]);
-    const [filesContents, setFilesContents] = useState<
-        { id: string; content: string }[]
-    >([]);
 
     const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
-
-    const contentById = useMemo(() => {
-        const contentById: Record<string, string> = {};
-
-        filesContents.forEach((fileContent) => {
-            contentById[fileContent.id] = fileContent.content;
-        });
-
-        return contentById;
-    }, [filesContents]);
 
     const mainActions = createMainActions(
         setOpenedFilesId,
         setSelectedFileId,
-        setFilesContents,
         selectedFileId,
         openedFiles,
     );
 
-    return { selectedFileId, openedFiles, contentById, mainActions };
+    return { selectedFileId, openedFiles, mainActions };
 }
