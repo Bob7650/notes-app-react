@@ -1,10 +1,3 @@
-import { useContext, useState } from "react";
-import IconButton from "../../../shared/components/IconButton";
-import { DrawerContext } from "../../../shared/context/DrawerContext/DrawerContext";
-import Popover from "../../../shared/components/Popover";
-import PopoverItem from "../../../shared/components/PopoverItem";
-import type { Rect } from "../../../shared/types/Rect";
-import FolderManager from "./FolderManager/FolderManager";
 import {
     DndContext,
     DragOverlay,
@@ -12,9 +5,15 @@ import {
     useSensor,
     useSensors,
 } from "@dnd-kit/core";
+import FolderTree from "./FolderTree/FolderTree";
+import { useContext, useState } from "react";
+import type { Rect } from "../../../shared/types/Rect";
+import Popover from "../../../shared/components/Popover";
+import PopoverItem from "../../../shared/components/PopoverItem";
+import { DrawerContext } from "../../../shared/context/DrawerContext/DrawerContext";
 import { FilesContext } from "../../../shared/context/FilesContext/FilesContext";
 
-export default function MainPageDrawer() {
+export default function DrawerFilesSection() {
     const { drawerActions } = useContext(DrawerContext)!;
     const { fileActions } = useContext(FilesContext)!;
 
@@ -46,36 +45,15 @@ export default function MainPageDrawer() {
     );
 
     return (
-        <aside className="drawer-section">
-            <div className="drawer-top-bar bordered">
-                <IconButton iconName="folder" />
-                <IconButton iconName="search" />
-            </div>
-            <div className="drawer-contents bordered">
-                <div className="top-icons-section">
-                    <IconButton
-                        iconName="edit_square"
-                        onClick={() => {
-                            fileActions.add("note");
-                        }}
+        <>
+            <div className="folders-section">
+                <DndContext sensors={sensors}>
+                    <FolderTree
+                        startFrom="root"
+                        onCallPopover={handleDisplayPopover}
                     />
-                    <IconButton
-                        iconName="create_new_folder"
-                        onClick={() => {
-                            fileActions.add("folder");
-                        }}
-                    />
-                    <IconButton iconName="sort_by_alpha" />
-                </div>
-                <div className="folders-section">
-                    <DndContext sensors={sensors}>
-                        <FolderManager
-                            startFrom="root"
-                            onCallPopover={handleDisplayPopover}
-                        />
-                        <DragOverlay>Hello</DragOverlay>
-                    </DndContext>
-                </div>
+                    <DragOverlay>Hello</DragOverlay>
+                </DndContext>
             </div>
 
             <Popover
@@ -104,6 +82,6 @@ export default function MainPageDrawer() {
                     }}
                 />
             </Popover>
-        </aside>
+        </>
     );
 }

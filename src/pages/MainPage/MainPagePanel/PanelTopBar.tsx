@@ -17,7 +17,7 @@ import CardPlaceholder from "./NoteCard/CardPlaceholder";
 import { MainPanelContext } from "../../../shared/context/MainPanelContext/MainPanelContext";
 import { FilesContext } from "../../../shared/context/FilesContext/FilesContext";
 
-export default function TopBar() {
+export default function PanelTopBar() {
     const mainTopBarRef = useRef<HTMLDivElement>(null);
     const { selectedFileId, mainActions, openedFiles } =
         useContext(MainPanelContext)!;

@@ -1,9 +1,9 @@
 import { useContext } from "react";
-import IconButton from "../../../shared/components/IconButton";
 import TextEditor from "./TextEditor/TextEditor";
-import TopBar from "./TopBar";
+import TopBar from "./PanelTopBar";
 import { MainPanelContext } from "../../../shared/context/MainPanelContext/MainPanelContext";
 import { FilesContext } from "../../../shared/context/FilesContext/FilesContext";
+import PanelTools from "./PanelTools";
 
 export default function MainPagePanel() {
     const { fileActions, contentById } = useContext(FilesContext)!;
@@ -13,13 +13,7 @@ export default function MainPagePanel() {
         <div className="main-panel-section">
             <TopBar />
             <div className="note-tools-section bordered">
-                <div className="tools-section">
-                    <div className="arrow-container">
-                        <IconButton iconName="arrow_back" />
-                        <IconButton iconName="arrow_forward" />
-                    </div>
-                    <IconButton iconName="more_vert" />
-                </div>
+                <PanelTools />
                 <div className="note-section">
                     <div className="editor-wrapper">
                         {/* TODO: Render Text Editor only when any card is selected */}

@@ -13,7 +13,7 @@ const createDrawerActions = (
     expandFolder: (id: string): void => {
         setExpandedId((prevState) =>
             prevState.find((expandedId) => expandedId === id)
-                ? prevState
+                ? prevState.filter((expId) => expId !== id)
                 : [...prevState, id],
         );
     },
