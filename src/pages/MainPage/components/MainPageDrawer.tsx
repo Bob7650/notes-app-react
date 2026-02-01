@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import IconButton from "../../../shared/components/IconButton";
-import { DrawerContext } from "../../../shared/context/NotesContext/NotesContext";
+import { DrawerContext } from "../../../shared/context/DrawerContext/DrawerContext";
 import Popover from "../../../shared/components/Popover";
 import PopoverItem from "../../../shared/components/PopoverItem";
 import type { Rect } from "../../../shared/types/Rect";

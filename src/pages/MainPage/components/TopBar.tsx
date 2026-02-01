@@ -15,13 +15,13 @@ import {
     SortableContext,
 } from "@dnd-kit/sortable";
 import CardPlaceholder from "./NoteCard/CardPlaceholder";
-import { CardsContext } from "../../../shared/context/TabsContext/CardsContext";
-import { DrawerContext } from "../../../shared/context/NotesContext/NotesContext";
+import { MainPanelContext } from "../../../shared/context/MainPanelContext/MainPanelContext";
+import { DrawerContext } from "../../../shared/context/DrawerContext/DrawerContext";
 
 export default function TopBar() {
     const mainTopBarRef = useRef<HTMLDivElement>(null);
     const { selectedCardId, cardActions, openedCards } =
-        useContext(CardsContext)!!;
+        useContext(MainPanelContext)!!;
     const { drawerItemsById } = useContext(DrawerContext)!;
     const [activeId, setActiveId] = useState<number | null>(null);
     const sensors = useSensors(
@@ -29,7 +29,7 @@ export default function TopBar() {
             activationConstraint: {
                 distance: 10,
             },
-        })
+        }),
     );
 
     const handleDragStart = (e: DragEndEvent) => {
@@ -44,7 +44,7 @@ export default function TopBar() {
         if (over && active.id !== over.id) {
             cardActions.set((cards) => {
                 const oldIndex = cards.findIndex(
-                    (card) => card.id === active.id
+                    (card) => card.id === active.id,
                 );
                 const newIndex = cards.findIndex((card) => card.id === over.id);
                 return arrayMove(cards, oldIndex, newIndex);

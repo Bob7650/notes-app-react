@@ -1,8 +1,8 @@
 import { useContext } from "react";
 import EditableLabel from "../../../../shared/components/EditableLabel";
 import ItemInteractionManager from "../InteractionManager/ItemInteractionManager";
-import { CardsContext } from "../../../../shared/context/TabsContext/CardsContext";
-import { DrawerContext } from "../../../../shared/context/NotesContext/NotesContext";
+import { MainPanelContext } from "../../../../shared/context/MainPanelContext/MainPanelContext";
+import { DrawerContext } from "../../../../shared/context/DrawerContext/DrawerContext";
 import type { Rect } from "../../../../shared/types/Rect";
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
 
 // TODO: put styles in a css file
 export default function FolderManager({ startFrom, onCallPopover }: Props) {
-    const { selectedCardId, cardActions } = useContext(CardsContext)!;
+    const { selectedCardId, cardActions } = useContext(MainPanelContext)!;
     const { renamingId, drawerActions, drawerMap } = useContext(DrawerContext)!;
 
     const handleNameChanged = (newValue: string, id: number) => {

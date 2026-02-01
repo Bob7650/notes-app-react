@@ -1,7 +1,7 @@
 import { useContext, type MouseEvent, type ReactNode } from "react";
 import "./ItemInteractionManager.style.css";
 import Draggable from "../../../../shared/components/Draggable";
-import { CardsContext } from "../../../../shared/context/TabsContext/CardsContext";
+import { MainPanelContext } from "../../../../shared/context/MainPanelContext/MainPanelContext";
 import Droppable from "../../../../shared/components/Droppable";
 
 interface Props {
@@ -17,7 +17,7 @@ export default function ItemInteractionManager({
     onMouseDown,
     children,
 }: Props) {
-    const { selectedCardId } = useContext(CardsContext)!;
+    const { selectedCardId } = useContext(MainPanelContext)!;
 
     return (
         <Draggable id={itemId}>

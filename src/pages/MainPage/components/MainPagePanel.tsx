@@ -1,13 +1,13 @@
 import { useContext } from "react";
 import IconButton from "../../../shared/components/IconButton";
 import TextEditor from "./TextEditor/TextEditor";
-import { DrawerContext } from "../../../shared/context/NotesContext/NotesContext";
+import { DrawerContext } from "../../../shared/context/DrawerContext/DrawerContext";
 import TopBar from "./TopBar";
-import { CardsContext } from "../../../shared/context/TabsContext/CardsContext";
+import { MainPanelContext } from "../../../shared/context/MainPanelContext/MainPanelContext";
 
 export default function MainPagePanel() {
     const { drawerActions, contentById } = useContext(DrawerContext)!;
-    const { selectedCardId } = useContext(CardsContext)!;
+    const { selectedCardId } = useContext(MainPanelContext)!;
 
     return (
         <div className="main-panel-section">
@@ -34,7 +34,7 @@ export default function MainPagePanel() {
                             onChangeDebounce={(updatedContent) => {
                                 drawerActions.updateNoteContent(
                                     selectedCardId,
-                                    updatedContent
+                                    updatedContent,
                                 );
                             }}
                         />
