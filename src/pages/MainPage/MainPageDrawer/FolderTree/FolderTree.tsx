@@ -31,16 +31,12 @@ export default function FolderTree({ startFrom, onCallPopover }: Props) {
                             />
 
                             <div className="folder-children">
-                                {expandedId.includes(root.id) &&
-                                    childrenById
-                                        .get(root.id)
-                                        ?.map((child) => (
-                                            <FolderTree
-                                                key={child.id}
-                                                startFrom={root.id}
-                                                onCallPopover={onCallPopover}
-                                            />
-                                        ))}
+                                {expandedId.includes(root.id) && (
+                                    <FolderTree
+                                        startFrom={root.id}
+                                        onCallPopover={onCallPopover}
+                                    />
+                                )}
                             </div>
                         </Droppable>
                     ) : (

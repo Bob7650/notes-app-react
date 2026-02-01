@@ -47,7 +47,16 @@ export default function DrawerFilesSection() {
     return (
         <>
             <div className="folders-section">
-                <DndContext sensors={sensors}>
+                <DndContext
+                    sensors={sensors}
+                    onDragEnd={(e) => {
+                        if (e.over)
+                            fileActions.setParent(
+                                e.active.id.toString(),
+                                e.over.id.toString(),
+                            );
+                    }}
+                >
                     <FolderTree
                         startFrom="root"
                         onCallPopover={handleDisplayPopover}
