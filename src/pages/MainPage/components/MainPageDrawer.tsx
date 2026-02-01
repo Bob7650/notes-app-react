@@ -12,12 +12,14 @@ import {
     useSensor,
     useSensors,
 } from "@dnd-kit/core";
+import { FilesContext } from "../../../shared/context/FilesContext/FilesContext";
 
 export default function MainPageDrawer() {
     const { drawerActions } = useContext(DrawerContext)!;
+    const { fileActions } = useContext(FilesContext)!;
 
     const [isPopoverOpen, setPopoverOpen] = useState(false);
-    const [popoverCallerId, setPopoverCallerId] = useState<number | null>(null);
+    const [popoverCallerId, setPopoverCallerId] = useState<string | null>(null);
     const [anchor, setAnchor] = useState<Rect>({
         x: 0,
         y: 0,
@@ -25,7 +27,7 @@ export default function MainPageDrawer() {
         height: 0,
     });
 
-    const handleDisplayPopover = (newAnchor: Rect, callerId: number) => {
+    const handleDisplayPopover = (newAnchor: Rect, callerId: string) => {
         setPopoverCallerId(callerId);
         setAnchor(newAnchor);
         setPopoverOpen(true);
@@ -54,13 +56,13 @@ export default function MainPageDrawer() {
                     <IconButton
                         iconName="edit_square"
                         onClick={() => {
-                            drawerActions.addItem("note");
+                            fileActions.add("note");
                         }}
                     />
                     <IconButton
                         iconName="create_new_folder"
                         onClick={() => {
-                            drawerActions.addItem("folder");
+                            fileActions.add("folder");
                         }}
                     />
                     <IconButton iconName="sort_by_alpha" />
@@ -90,7 +92,7 @@ export default function MainPageDrawer() {
                     actionName="Rename"
                     iconName="edit"
                     onClick={() => {
-                        drawerActions.setEntryRenaming(popoverCallerId!);
+                        drawerActions.makeEditable(popoverCallerId!);
                     }}
                 />
                 <PopoverItem
@@ -98,7 +100,7 @@ export default function MainPageDrawer() {
                     iconName="delete"
                     isDanger={true}
                     onClick={() => {
-                        drawerActions.removeEntry(popoverCallerId!);
+                        fileActions.remove(popoverCallerId!);
                     }}
                 />
             </Popover>

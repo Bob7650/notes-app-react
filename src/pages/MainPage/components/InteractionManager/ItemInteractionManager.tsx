@@ -5,7 +5,7 @@ import { MainPanelContext } from "../../../../shared/context/MainPanelContext/Ma
 import Droppable from "../../../../shared/components/Droppable";
 
 interface Props {
-    itemId: number;
+    itemId: string;
     onMouseDown?: (
         e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
     ) => void;
@@ -17,14 +17,14 @@ export default function ItemInteractionManager({
     onMouseDown,
     children,
 }: Props) {
-    const { selectedCardId } = useContext(MainPanelContext)!;
+    const { selectedFileId } = useContext(MainPanelContext)!;
 
     return (
         <Draggable id={itemId}>
             <Droppable id={itemId}>
                 <div
                     className={`selector-wrapper${
-                        itemId === selectedCardId ? " selector-selected" : ""
+                        itemId === selectedFileId ? " selector-selected" : ""
                     }`}
                     onContextMenu={(e) => e.preventDefault()}
                     onMouseDown={(e) => {

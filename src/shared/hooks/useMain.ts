@@ -1,3 +1,4 @@
+import { arrayMove } from "@dnd-kit/sortable";
 import { useState, type Dispatch, type SetStateAction } from "react";
 
 const createMainActions = (
@@ -39,6 +40,18 @@ const createMainActions = (
         setOpenedFilesId((prevState) =>
             prevState.filter((openedId) => openedId !== fileId),
         );
+    },
+    swapTabsPosition: (fileIdA: string, fileIdB: string): void => {
+        setOpenedFilesId((prevState) => {
+            const oldIndex = prevState.findIndex(
+                (fileId) => fileId === fileIdA,
+            );
+            const newIndex = prevState.findIndex(
+                (fileId) => fileId === fileIdB,
+            );
+
+            return arrayMove(prevState, oldIndex, newIndex);
+        });
     },
 });
 

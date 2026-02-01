@@ -10,20 +10,19 @@ import {
     type DragEndEvent,
 } from "@dnd-kit/core";
 import {
-    arrayMove,
     horizontalListSortingStrategy,
     SortableContext,
 } from "@dnd-kit/sortable";
 import CardPlaceholder from "./NoteCard/CardPlaceholder";
 import { MainPanelContext } from "../../../shared/context/MainPanelContext/MainPanelContext";
-import { DrawerContext } from "../../../shared/context/DrawerContext/DrawerContext";
+import { FilesContext } from "../../../shared/context/FilesContext/FilesContext";
 
 export default function TopBar() {
     const mainTopBarRef = useRef<HTMLDivElement>(null);
-    const { selectedCardId, cardActions, openedCards } =
-        useContext(MainPanelContext)!!;
-    const { drawerItemsById } = useContext(DrawerContext)!;
-    const [activeId, setActiveId] = useState<number | null>(null);
+    const { selectedFileId, mainActions, openedFiles } =
+        useContext(MainPanelContext)!;
+    const { titleById } = useContext(FilesContext)!;
+    const [activeId, setActiveId] = useState<string | null>(null);
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
@@ -35,20 +34,17 @@ export default function TopBar() {
     const handleDragStart = (e: DragEndEvent) => {
         const { active } = e;
 
-        setActiveId(active.id as number);
+        setActiveId(active.id.toString());
     };
 
     const handleDragEnd = (e: DragEndEvent) => {
         const { active, over } = e;
 
         if (over && active.id !== over.id) {
-            cardActions.set((cards) => {
-                const oldIndex = cards.findIndex(
-                    (card) => card.id === active.id,
-                );
-                const newIndex = cards.findIndex((card) => card.id === over.id);
-                return arrayMove(cards, oldIndex, newIndex);
-            });
+            mainActions.swapTabsPosition(
+                over.id.toString(),
+                active.id.toString(),
+            );
         }
 
         setActiveId(null);
@@ -79,32 +75,25 @@ export default function TopBar() {
                     onDragEnd={handleDragEnd}
                 >
                     <SortableContext
-                        items={openedCards}
+                        items={openedFiles}
                         strategy={horizontalListSortingStrategy}
                     >
-                        {openedCards.map((card) => (
+                        {openedFiles.map((fileId) => (
                             <NoteCard
-                                key={card.id}
-                                id={card.id}
-                                title={card.title}
-                                isSelected={selectedCardId === card.id}
+                                key={fileId}
+                                id={fileId}
+                                title={titleById[fileId]}
+                                isSelected={selectedFileId === fileId}
                                 onClick={() => {
-                                    // Introduce switch maybe
-                                    cardActions.new(card);
+                                    mainActions.openNote(fileId);
                                 }}
-                                onClose={() => cardActions.close(card.id)}
+                                onClose={() => mainActions.closeNote(fileId)}
                             />
                         ))}
                     </SortableContext>
                     <DragOverlay>
                         {activeId ? (
-                            <CardPlaceholder
-                                title={
-                                    selectedCardId
-                                        ? drawerItemsById[activeId].title
-                                        : ""
-                                }
-                            />
+                            <CardPlaceholder title={titleById[activeId]} />
                         ) : null}
                     </DragOverlay>
                 </DndContext>

@@ -4,11 +4,11 @@ import "./NoteCard.style.css";
 import { CSS } from "@dnd-kit/utilities";
 
 interface Props {
+    id: string;
     title: string | undefined;
+    isSelected?: boolean;
     onClick?: () => void;
     onClose?: () => void;
-    isSelected?: boolean;
-    id: number;
 }
 
 export default function NoteCard({

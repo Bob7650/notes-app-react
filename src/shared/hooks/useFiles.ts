@@ -73,6 +73,8 @@ export function useFiles() {
         return map;
     }, [drawerItems]);
 
+    const [lastRemovedId, setLastRemovedId] = useState<string | null>(null);
+
     const fileActions = useMemo(
         () =>
             createFileActions(
@@ -93,12 +95,21 @@ export function useFiles() {
         return contentById;
     }, [filesContents]);
 
-    const [lastRemovedId, setLastRemovedId] = useState<string | null>(null);
+    const titleById = useMemo(() => {
+        const titleById: Record<string, string> = {};
+
+        drawerItems.forEach((fileContent) => {
+            titleById[fileContent.id] = fileContent.title;
+        });
+
+        return titleById;
+    }, [drawerItems]);
 
     return {
         fileActions,
         drawerItems,
         contentById,
+        titleById,
         childrenById,
         lastRemovedId,
     };

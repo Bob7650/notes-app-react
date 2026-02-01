@@ -1,13 +1,13 @@
 import { useContext } from "react";
 import IconButton from "../../../shared/components/IconButton";
 import TextEditor from "./TextEditor/TextEditor";
-import { DrawerContext } from "../../../shared/context/DrawerContext/DrawerContext";
 import TopBar from "./TopBar";
 import { MainPanelContext } from "../../../shared/context/MainPanelContext/MainPanelContext";
+import { FilesContext } from "../../../shared/context/FilesContext/FilesContext";
 
 export default function MainPagePanel() {
-    const { drawerActions, contentById } = useContext(DrawerContext)!;
-    const { selectedCardId } = useContext(MainPanelContext)!;
+    const { fileActions, contentById } = useContext(FilesContext)!;
+    const { selectedFileId } = useContext(MainPanelContext)!;
 
     return (
         <div className="main-panel-section">
@@ -23,21 +23,23 @@ export default function MainPagePanel() {
                 <div className="note-section">
                     <div className="editor-wrapper">
                         {/* TODO: Render Text Editor only when any card is selected */}
-                        <TextEditor
-                            noteId={selectedCardId ? selectedCardId : -1}
-                            initialValue={
-                                selectedCardId
-                                    ? contentById[selectedCardId]
-                                    : ""
-                            }
-                            onChange={() => {}}
-                            onChangeDebounce={(updatedContent) => {
-                                drawerActions.updateNoteContent(
-                                    selectedCardId,
-                                    updatedContent,
-                                );
-                            }}
-                        />
+                        {selectedFileId && (
+                            <TextEditor
+                                noteId={selectedFileId}
+                                initialValue={
+                                    selectedFileId
+                                        ? contentById[selectedFileId]
+                                        : ""
+                                }
+                                onChange={() => {}}
+                                onChangeDebounce={(updatedContent) => {
+                                    fileActions.updateContent(
+                                        selectedFileId,
+                                        updatedContent,
+                                    );
+                                }}
+                            />
+                        )}
                     </div>
                 </div>
             </div>

@@ -3,14 +3,14 @@ import type { ReactNode } from "react";
 import { CSS } from "@dnd-kit/utilities";
 
 interface Props {
-    id: number;
+    id: string;
     children: ReactNode;
 }
 
 export default function Draggable({ id, children }: Props) {
     const { attributes, listeners, setNodeRef, transform, isDragging } =
         useDraggable({
-            id: `${id}`,
+            id: id,
         });
     //transform: CSS.Translate.toString(transform)
     const style = { opacity: isDragging ? 0.3 : 1 };

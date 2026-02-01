@@ -7,7 +7,7 @@ const createDrawerActions = (
     makeEditable: (id: string) => {
         setEditableId(id);
     },
-    makeStatic: () => {
+    makeAllStatic: () => {
         setEditableId(null);
     },
     expandFolder: (id: string): void => {
