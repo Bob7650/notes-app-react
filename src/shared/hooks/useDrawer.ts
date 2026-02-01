@@ -66,7 +66,7 @@ const createPopoverActions = (
     removeById: (id: string): void => {
         sharedActions.removeById(id);
     },
-    copy: (id: string): void => {
+    copy: (): void => {
         // TODO: implement
     },
     makeEditable: (id: string): void => {

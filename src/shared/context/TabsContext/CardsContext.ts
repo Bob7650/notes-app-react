@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import type { CardAction } from "../../hooks/useCards";
+import type { CardAction } from "../../hooks/useMain";
 import type { Card } from "../../types/Card";
 
 type CardContextValue = {

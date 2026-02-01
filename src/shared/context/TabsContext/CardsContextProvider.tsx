@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { CardsContext } from "./CardsContext";
-import useCards from "../../hooks/useCards";
+import useCards from "../../hooks/useMain";
 
 export default function CardsContextProvider({
     children,
