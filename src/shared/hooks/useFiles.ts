@@ -20,13 +20,29 @@ const createFileActions = (
             parentId: "root",
             type: type,
         };
-        const defaultContent: string = "Start typing here...";
 
-        setDrawerItems((prevState) => [...prevState, defaultFile]);
-        setFilesContents((prevState) => [
-            ...prevState,
-            { id: defaultFile.id, content: defaultContent },
-        ]);
+        if (type === "note") {
+            const defaultContent: string = "Start typing here...";
+
+            setDrawerItems((prevState) => [...prevState, defaultFile]);
+            setFilesContents((prevState) => [
+                ...prevState,
+                { id: defaultFile.id, content: defaultContent },
+            ]);
+        }
+        if (type === "folder") {
+            setDrawerItems((prevState) => {
+                let firstNoteInd = prevState.findIndex(
+                    (item) => item.type === "note",
+                );
+
+                if (firstNoteInd === -1) firstNoteInd = prevState.length;
+
+                const newArr = prevState.slice();
+                newArr.splice(firstNoteInd, 0, defaultFile);
+                return newArr;
+            });
+        }
     },
     remove: (id: string) => {
         setDrawerItems((prevState) =>
