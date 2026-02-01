@@ -1,14 +1,17 @@
 import { useContext, useEffect } from "react";
-import { DrawerContext } from "../context/NotesContext/NotesContext";
-import { CardsContext } from "../context/TabsContext/CardsContext";
+import { MainPanelContext } from "../context/MainPanelContext/MainPanelContext";
+import { FilesContext } from "../context/FilesContext/FilesContext";
 
 export default function AppController() {
-    const { lastRemovedId } = useContext(DrawerContext)!;
-    const { cardActions } = useContext(CardsContext)!;
+    const { lastRemovedId } = useContext(FilesContext)!;
+    const { mainActions } = useContext(MainPanelContext)!;
 
+    /**
+     * Close tab associated with a note when the note is removed
+     */
     useEffect(() => {
         if (!lastRemovedId) return;
-        cardActions.close(lastRemovedId);
+        mainActions.closeNote(lastRemovedId);
     }, [lastRemovedId]);
 
     return null;

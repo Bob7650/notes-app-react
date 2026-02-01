@@ -1,16 +1,16 @@
 import { type ReactNode } from "react";
-import { DrawerContext } from "./NotesContext";
+import { DrawerContext } from "./DrawerContext";
 import { useDrawer } from "../../hooks/useDrawer";
 
-export default function NotesContextProvider({
+export default function DrawerContextProvider({
     children,
 }: {
     children: ReactNode;
 }) {
-    const notesState = useDrawer();
+    const drawerState = useDrawer();
 
     return (
-        <DrawerContext.Provider value={notesState}>
+        <DrawerContext.Provider value={drawerState}>
             {children}
         </DrawerContext.Provider>
     );

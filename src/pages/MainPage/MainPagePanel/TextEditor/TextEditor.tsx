@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import "./TextEditor.style.css";
 
 interface Props {
-    noteId: number;
+    noteId: string;
     initialValue: string;
     onChange?: (newValue: string) => void;
     onChangeDebounce?: (newValue: string) => void;
