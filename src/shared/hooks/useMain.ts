@@ -22,6 +22,7 @@ const createMainActions = (
 
         setSelectedFileId(fileId);
     },
+    // FIXME: function works incorrectly when closing tab that is before active tab
     closeNote: (fileId: string): void => {
         if (fileId === selectedFileId) {
             const currentCardInd = openedFiles.findIndex(

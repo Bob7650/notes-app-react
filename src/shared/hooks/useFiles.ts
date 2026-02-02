@@ -13,7 +13,7 @@ const createFileActions = (
         >
     >,
 ) => ({
-    // ERR: function does not respect children of other folders
+    // FIXME: function does not respect children of other folders
     add: (type: "folder" | "note"): void => {
         const defaultFile: DrawerFile = {
             id: String(Date.now()),
