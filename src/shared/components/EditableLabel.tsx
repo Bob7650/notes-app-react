@@ -8,7 +8,7 @@ interface Props {
     onNameChanged: (newName: string) => void;
     onRenameCanceled: () => void;
 }
-
+// ERR: when in renaming mode, the rename does not confirm when clicking on another note in the drawer
 export default function EditableLabel({
     onNameChanged,
     onRenameCanceled,
@@ -32,7 +32,7 @@ export default function EditableLabel({
             if (canEdit) confirmRename();
         },
         componentRef,
-        [confirmRename, canEdit]
+        [confirmRename, canEdit],
     );
 
     return (

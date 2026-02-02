@@ -2,7 +2,7 @@ import { useCallback, useContext, useMemo, useState } from "react";
 import { DrawerContext } from "../../../../shared/context/DrawerContext/DrawerContext";
 import type { Rect } from "../../../../shared/types/Rect";
 import { FilesContext } from "../../../../shared/context/FilesContext/FilesContext";
-import "./ItemInteractionManager.style.css";
+import "./DrawerItem.style.css";
 import Folder from "./Folder";
 import File from "./File";
 import Droppable from "../../../../shared/components/Droppable";
@@ -16,42 +16,35 @@ import {
     useSensors,
     type DragEndEvent,
 } from "@dnd-kit/core";
+import { getSubtreeRange } from "../../../../shared/hooks/useFiles";
 
 interface Props {
     onCallPopover: (anchor: Rect, callerId: string) => void;
 }
 
 export default function FolderTree({ onCallPopover }: Props) {
-    const { expandedId } = useContext(DrawerContext)!;
+    const { expandedId, renamingId } = useContext(DrawerContext)!;
     const { drawerItems, fileActions } = useContext(FilesContext)!;
 
     const visibleNodes = useMemo(() => {
         const result: DrawerFile[] = [];
-        const hiddenDepths = new Set<number>();
+        let hiddenUntilDepth: number | null = null;
 
         for (const node of drawerItems) {
-            // If this node is hidden by a collapsed ancestor
-            if ([...hiddenDepths].some((d) => node.depth > d)) {
+            if (hiddenUntilDepth !== null && node.depth > hiddenUntilDepth) {
                 continue;
             }
 
+            hiddenUntilDepth = null;
             result.push(node);
 
-            // If this node is collapsed, hide its children
-            if (expandedId.includes(node.id)) {
-                hiddenDepths.add(node.depth);
-            }
-
-            // Clean up when we move back up the tree
-            for (const d of [...hiddenDepths]) {
-                if (node.depth <= d) {
-                    hiddenDepths.delete(d);
-                }
+            if (!expandedId.includes(node.id)) {
+                hiddenUntilDepth = node.depth;
             }
         }
 
         return result;
-    }, [drawerItems]);
+    }, [drawerItems, expandedId]);
 
     const [validDrops, setValidDrops] = useState<DrawerFile[]>([]);
     const getValidDrops = useCallback(
@@ -79,7 +72,10 @@ export default function FolderTree({ onCallPopover }: Props) {
         console.log(`Drag ended ${e.over?.id}`);
         setValidDrops([]);
         if (e.over)
-            fileActions.setParent(e.active.id.toString(), e.over.id.toString());
+            fileActions.dropFileToFolder(
+                e.active.id.toString(),
+                e.over.id.toString(),
+            );
     };
 
     return (
@@ -87,7 +83,7 @@ export default function FolderTree({ onCallPopover }: Props) {
             sensors={sensors}
             onDragEnd={handleDragEnd}
             onDragStart={(e) => {
-                console.log("Calculate valid drops list");
+                //console.log("Calculate valid drops list");
                 setValidDrops(getValidDrops(e.active.id.toString()));
             }}
         >
@@ -96,21 +92,22 @@ export default function FolderTree({ onCallPopover }: Props) {
                     {item.type === "folder" ? (
                         <Droppable
                             id={item.id}
-                            canDropInto={
-                                validDrops.includes(
-                                    item,
-                                ) /*Check here if item.id in valid drops list*/
-                            }
+                            canDropInto={validDrops.includes(item)}
                         >
-                            <Folder
-                                drawerFolder={item}
-                                onCallPopover={onCallPopover}
-                            />
+                            <Draggable
+                                id={item.id}
+                                canDrag={item.id !== renamingId}
+                            >
+                                <Folder
+                                    drawerFolder={item}
+                                    onCallPopover={onCallPopover}
+                                />
+                            </Draggable>
                         </Droppable>
                     ) : (
                         <Draggable
                             id={item.id}
-                            canDrag={true /*Turn this to false when renaming*/}
+                            canDrag={item.id !== renamingId}
                         >
                             <File
                                 drawerFile={item}
@@ -123,20 +120,4 @@ export default function FolderTree({ onCallPopover }: Props) {
             <DragOverlay>Hello</DragOverlay>
         </DndContext>
     );
-}
-
-function getSubtreeRange(
-    files: DrawerFile[],
-    rootId: string,
-): { startInd: number; endInd: number } {
-    const rootFile = files.find((item) => item.id === rootId);
-    if (!rootFile) return { startInd: 0, endInd: 0 };
-
-    const rootDepth = rootFile.depth;
-    const startInd = files.indexOf(rootFile);
-
-    let endInd = startInd;
-    while (++endInd < files.length && files[endInd].depth > rootDepth);
-
-    return { startInd: startInd, endInd: endInd };
 }

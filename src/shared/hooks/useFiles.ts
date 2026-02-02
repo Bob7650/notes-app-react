@@ -13,6 +13,7 @@ const createFileActions = (
         >
     >,
 ) => ({
+    // ERR: function does not respect children of other folders
     add: (type: "folder" | "note"): void => {
         const defaultFile: DrawerFile = {
             id: String(Date.now()),
@@ -71,12 +72,45 @@ const createFileActions = (
             ),
         );
     },
-    setParent: (id: string, parentId: string): void => {
-        setDrawerItems((prevState) =>
-            prevState.map((item) =>
-                item.id === id ? { ...item, parentId: parentId } : item,
-            ),
-        );
+    dropFileToFolder: (fileId: string, folderId: string): void => {
+        setDrawerItems((prevState) => {
+            const prevStateCopy = prevState.slice();
+
+            const { startInd, endInd } = getSubtreeRange(prevStateCopy, fileId);
+
+            let subtreeItems = prevStateCopy.splice(
+                startInd,
+                endInd - startInd + 1,
+            );
+
+            const folderFile = prevStateCopy.find(
+                (item) => item.id === folderId,
+            );
+
+            if (!folderFile) {
+                console.error(
+                    "Folder does not exist or trying to drop into child folder!",
+                );
+                return prevState;
+            }
+
+            const depthDelta = folderFile.depth + 1 - subtreeItems[0].depth;
+            subtreeItems = subtreeItems.map((item) => ({
+                ...item,
+                depth: item.depth + depthDelta,
+            }));
+
+            const folderInd = prevStateCopy.indexOf(folderFile);
+            prevStateCopy.splice(folderInd + 1, 0, ...subtreeItems);
+
+            console.log(
+                `StartInd: ${startInd}, 
+                EndInd: ${endInd}, 
+                FolderInd: ${folderInd}, 
+                depthOfRoot: ${subtreeItems[0].depth}`,
+            );
+            return prevStateCopy;
+        });
     },
 });
 
@@ -126,4 +160,21 @@ export function useFiles() {
         titleById,
         lastRemovedId,
     };
+}
+
+export function getSubtreeRange(
+    files: DrawerFile[],
+    rootId: string,
+): { startInd: number; endInd: number } {
+    const rootFile = files.find((item) => item.id === rootId);
+    if (!rootFile) return { startInd: 0, endInd: 0 };
+
+    const rootDepth = rootFile.depth;
+    const startInd = files.indexOf(rootFile);
+
+    let endInd = startInd;
+    while (++endInd < files.length && files[endInd].depth > rootDepth);
+    endInd--;
+
+    return { startInd: startInd, endInd: endInd };
 }
