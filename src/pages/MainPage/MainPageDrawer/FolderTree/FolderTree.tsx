@@ -54,7 +54,7 @@ export default function FolderTree({ onCallPopover }: Props) {
                 draggedId,
             );
             const validDrops = drawerItems.slice();
-            validDrops.splice(startInd, endInd - startInd);
+            validDrops.splice(startInd, endInd - startInd + 1);
             return validDrops;
         },
         [drawerItems],
