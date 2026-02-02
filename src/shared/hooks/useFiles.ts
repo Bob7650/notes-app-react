@@ -35,7 +35,7 @@ const createFileActions = (
         if (type === "folder") {
             setDrawerItems((prevState) => {
                 let firstNoteInd = prevState.findIndex(
-                    (item) => item.type === "note",
+                    (item) => item.type === "note" && item.depth === 0,
                 );
 
                 if (firstNoteInd === -1) firstNoteInd = prevState.length;
