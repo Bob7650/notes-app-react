@@ -56,6 +56,7 @@ const createFileActions = (
             return;
         }
     },
+    // TODO: remove a folder with all of its children
     remove: (id: string) => {
         setDrawerItems((prevState) =>
             prevState.filter((item) => item.id !== id),
@@ -110,8 +111,17 @@ const createFileActions = (
                 depth: item.depth + depthDelta,
             }));
 
-            const folderInd = prevStateCopy.indexOf(folderFile);
-            prevStateCopy.splice(folderInd + 1, 0, ...subtreeItems);
+            let insertInd = prevStateCopy.indexOf(folderFile);
+            if (subtreeItems[0].type === "folder") {
+                insertInd++;
+            } else {
+                while (
+                    prevStateCopy[++insertInd].type !== "note" ||
+                    prevStateCopy[insertInd].depth > subtreeItems[0].depth
+                );
+            }
+
+            prevStateCopy.splice(insertInd, 0, ...subtreeItems);
 
             // console.log(
             //     "fileActions#dropFileToFolder()\n",
