@@ -3,7 +3,7 @@ import { useEffect, type DependencyList } from "react";
 export default function useOutsideClick(
     func: () => void,
     ref: React.RefObject<any>,
-    deps?: DependencyList
+    deps?: DependencyList,
 ) {
     useEffect(() => {
         let enabled = false;

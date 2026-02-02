@@ -1,5 +1,15 @@
-import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
+import {
+    useEffect,
+    useMemo,
+    useState,
+    type Dispatch,
+    type SetStateAction,
+} from "react";
 import type { DrawerFile } from "../types/DrawerFile";
+import { getFromLocalStorage, saveToLocalStorage } from "../utils/StorageUtils";
+
+const DRAWER_ITEMS_KEY = "drawer_items";
+const FILES_CONTENTS_KEY = "files_contents";
 
 const createFileActions = (
     setDrawerItems: Dispatch<SetStateAction<DrawerFile[]>>,
@@ -17,16 +27,34 @@ const createFileActions = (
         const defaultFile: DrawerFile = {
             id: String(Date.now()),
             title: type,
-            parentId: "root",
+            depth: 0,
             type: type,
         };
-        const defaultContent: string = "Start typing here...";
 
-        setDrawerItems((prevState) => [...prevState, defaultFile]);
-        setFilesContents((prevState) => [
-            ...prevState,
-            { id: defaultFile.id, content: defaultContent },
-        ]);
+        if (type === "note") {
+            const defaultContent = {
+                id: defaultFile.id,
+                content: "Start typing here...",
+            };
+
+            setDrawerItems((prevState) => [...prevState, defaultFile]);
+            setFilesContents((prevState) => [...prevState, defaultContent]);
+            return;
+        }
+        if (type === "folder") {
+            setDrawerItems((prevState) => {
+                let firstNoteInd = prevState.findIndex(
+                    (item) => item.type === "note" && item.depth === 0,
+                );
+
+                if (firstNoteInd === -1) firstNoteInd = prevState.length;
+
+                const newArr = prevState.slice();
+                newArr.splice(firstNoteInd, 0, defaultFile);
+                return newArr;
+            });
+            return;
+        }
     },
     remove: (id: string) => {
         setDrawerItems((prevState) =>
@@ -53,32 +81,66 @@ const createFileActions = (
             ),
         );
     },
-    setParent: (id: string, parentId: string): void => {
-        setDrawerItems((prevState) =>
-            prevState.map((item) =>
-                item.id === id ? { ...item, parentId: parentId } : item,
-            ),
-        );
+    dropFileToFolder: (fileId: string, folderId: string): void => {
+        setDrawerItems((prevState) => {
+            const prevStateCopy = prevState.slice();
+
+            const { startInd, endInd } = getSubtreeRange(prevStateCopy, fileId);
+
+            let subtreeItems = prevStateCopy.splice(
+                startInd,
+                endInd - startInd + 1,
+            );
+
+            const folderFile = prevStateCopy.find(
+                (item) => item.id === folderId,
+            );
+
+            if (!folderFile) {
+                console.error(
+                    "fileActions#dropFileToFolder()",
+                    "Folder does not exist or trying to drop into child folder!",
+                );
+                return prevState;
+            }
+
+            const depthDelta = folderFile.depth + 1 - subtreeItems[0].depth;
+            subtreeItems = subtreeItems.map((item) => ({
+                ...item,
+                depth: item.depth + depthDelta,
+            }));
+
+            const folderInd = prevStateCopy.indexOf(folderFile);
+            prevStateCopy.splice(folderInd + 1, 0, ...subtreeItems);
+
+            // console.log(
+            //     "fileActions#dropFileToFolder()\n",
+            //     `StartInd: ${startInd},\n` +
+            //         `EndInd: ${endInd},\n` +
+            //         `FolderInd: ${folderInd},\n` +
+            //         `depthOfRoot: ${subtreeItems[0].depth}`,
+            // );
+            return prevStateCopy;
+        });
     },
 });
 
 export function useFiles() {
-    const [drawerItems, setDrawerItems] = useState<DrawerFile[]>([]);
-
+    // save this
+    const [drawerItems, setDrawerItems] = useState<DrawerFile[]>(
+        getFromLocalStorage<DrawerFile>(DRAWER_ITEMS_KEY),
+    );
     const [filesContents, setFilesContents] = useState<
         { id: string; content: string }[]
-    >([]);
+    >(getFromLocalStorage<{ id: string; content: string }>(FILES_CONTENTS_KEY));
 
-    const childrenById = useMemo(() => {
-        const map: Map<string, DrawerFile[]> = new Map();
-
-        drawerItems.forEach((item) => {
-            const parentId = item.parentId;
-            map.set(parentId, [...(map.get(parentId) || []), item]);
-        });
-
-        return map;
+    useEffect(() => {
+        saveToLocalStorage(DRAWER_ITEMS_KEY, drawerItems);
     }, [drawerItems]);
+
+    useEffect(() => {
+        localStorage.setItem(FILES_CONTENTS_KEY, JSON.stringify(filesContents));
+    }, [filesContents]);
 
     const [lastRemovedId, setLastRemovedId] = useState<string | null>(null);
 
@@ -117,7 +179,23 @@ export function useFiles() {
         drawerItems,
         contentById,
         titleById,
-        childrenById,
         lastRemovedId,
     };
+}
+
+export function getSubtreeRange(
+    files: DrawerFile[],
+    rootId: string,
+): { startInd: number; endInd: number } {
+    const rootFile = files.find((item) => item.id === rootId);
+    if (!rootFile) return { startInd: 0, endInd: 0 };
+
+    const rootDepth = rootFile.depth;
+    const startInd = files.indexOf(rootFile);
+
+    let endInd = startInd;
+    while (++endInd < files.length && files[endInd].depth > rootDepth);
+    endInd--;
+
+    return { startInd: startInd, endInd: endInd };
 }

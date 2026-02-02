@@ -1,6 +1,6 @@
 export type DrawerFile = {
     id: string;
     title: string;
-    parentId: string | "root";
+    depth: number;
     type: "folder" | "note";
 };

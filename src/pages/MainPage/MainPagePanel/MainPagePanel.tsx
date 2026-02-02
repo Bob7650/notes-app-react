@@ -17,14 +17,10 @@ export default function MainPagePanel() {
                 <div className="note-section">
                     <div className="editor-wrapper">
                         {/* TODO: Render Text Editor only when any card is selected */}
-                        {selectedFileId && (
+                        {selectedFileId ? (
                             <TextEditor
                                 noteId={selectedFileId}
-                                initialValue={
-                                    selectedFileId
-                                        ? contentById[selectedFileId]
-                                        : ""
-                                }
+                                initialValue={contentById[selectedFileId]}
                                 onChange={() => {}}
                                 onChangeDebounce={(updatedContent) => {
                                     fileActions.updateContent(
@@ -33,6 +29,8 @@ export default function MainPagePanel() {
                                     );
                                 }}
                             />
+                        ) : (
+                            <p>EFN</p>
                         )}
                     </div>
                 </div>

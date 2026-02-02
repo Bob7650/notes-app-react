@@ -7,11 +7,10 @@ import { FilesContext } from "../../../../shared/context/FilesContext/FilesConte
 
 interface Props {
     drawerFile: DrawerFile;
-    hasParent: boolean;
     onCallPopover: any;
 }
 
-export default function File({ drawerFile, hasParent, onCallPopover }: Props) {
+export default function File({ drawerFile, onCallPopover }: Props) {
     const { mainActions, selectedFileId } = useContext(MainPanelContext)!;
     const { renamingId, drawerActions } = useContext(DrawerContext)!;
     const { fileActions } = useContext(FilesContext)!;
@@ -52,7 +51,7 @@ export default function File({ drawerFile, hasParent, onCallPopover }: Props) {
             onContextMenu={(e) => e.preventDefault()}
             onMouseDown={handleMouseDown}
         >
-            {hasParent && <div style={{ paddingLeft: 23 }} />}
+            <div style={{ paddingLeft: 23 * drawerFile.depth }} />
             <EditableLabel
                 initialValue={drawerFile.title}
                 canEdit={drawerFile.id === renamingId}

@@ -1,10 +1,3 @@
-import {
-    DndContext,
-    DragOverlay,
-    PointerSensor,
-    useSensor,
-    useSensors,
-} from "@dnd-kit/core";
 import FolderTree from "./FolderTree/FolderTree";
 import { useContext, useState } from "react";
 import type { Rect } from "../../../shared/types/Rect";
@@ -36,33 +29,10 @@ export default function DrawerFilesSection() {
         if (isPopoverOpen) setPopoverOpen(false);
     };
 
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 10,
-            },
-        }),
-    );
-
     return (
         <>
             <div className="folders-section">
-                <DndContext
-                    sensors={sensors}
-                    onDragEnd={(e) => {
-                        if (e.over)
-                            fileActions.setParent(
-                                e.active.id.toString(),
-                                e.over.id.toString(),
-                            );
-                    }}
-                >
-                    <FolderTree
-                        startFrom="root"
-                        onCallPopover={handleDisplayPopover}
-                    />
-                    <DragOverlay>Hello</DragOverlay>
-                </DndContext>
+                <FolderTree onCallPopover={handleDisplayPopover} />
             </div>
 
             <Popover

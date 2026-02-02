@@ -9,6 +9,7 @@
     cursor: pointer;
 
     border-radius: var(--round-rad-default);
+    user-select: none;
 
     &:hover,
     &.selector-selected {
