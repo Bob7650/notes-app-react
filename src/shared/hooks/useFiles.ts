@@ -1,5 +1,15 @@
-import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
+import {
+    useEffect,
+    useMemo,
+    useState,
+    type Dispatch,
+    type SetStateAction,
+} from "react";
 import type { DrawerFile } from "../types/DrawerFile";
+import { getFromLocalStorage, saveToLocalStorage } from "../utils/StorageUtils";
+
+const DRAWER_ITEMS_KEY = "drawer_items";
+const FILES_CONTENTS_KEY = "files_contents";
 
 const createFileActions = (
     setDrawerItems: Dispatch<SetStateAction<DrawerFile[]>>,
@@ -116,11 +126,21 @@ const createFileActions = (
 });
 
 export function useFiles() {
-    const [drawerItems, setDrawerItems] = useState<DrawerFile[]>([]);
-
+    // save this
+    const [drawerItems, setDrawerItems] = useState<DrawerFile[]>(
+        getFromLocalStorage<DrawerFile>(DRAWER_ITEMS_KEY),
+    );
     const [filesContents, setFilesContents] = useState<
         { id: string; content: string }[]
-    >([]);
+    >(getFromLocalStorage<{ id: string; content: string }>(FILES_CONTENTS_KEY));
+
+    useEffect(() => {
+        saveToLocalStorage(DRAWER_ITEMS_KEY, drawerItems);
+    }, [drawerItems]);
+
+    useEffect(() => {
+        localStorage.setItem(FILES_CONTENTS_KEY, JSON.stringify(filesContents));
+    }, [filesContents]);
 
     const [lastRemovedId, setLastRemovedId] = useState<string | null>(null);
 

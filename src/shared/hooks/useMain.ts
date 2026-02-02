@@ -1,5 +1,10 @@
 import { arrayMove } from "@dnd-kit/sortable";
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { getFromLocalStorage, saveToLocalStorage } from "../utils/StorageUtils";
+
+export type CardAction = ReturnType<typeof createMainActions>;
+
+const OPENED_FILES_KEY = "opened_files";
 
 const createMainActions = (
     setOpenedFilesId: Dispatch<SetStateAction<string[]>>,
@@ -55,10 +60,15 @@ const createMainActions = (
     },
 });
 
-export type CardAction = ReturnType<typeof createMainActions>;
-
 export default function useMain() {
-    const [openedFiles, setOpenedFilesId] = useState<string[]>([]);
+    // save this
+    const [openedFiles, setOpenedFilesId] = useState<string[]>(
+        getFromLocalStorage<string>(OPENED_FILES_KEY),
+    );
+
+    useEffect(() => {
+        saveToLocalStorage(OPENED_FILES_KEY, openedFiles);
+    }, [openedFiles]);
 
     const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
 

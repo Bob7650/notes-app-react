@@ -8,7 +8,7 @@ interface Props {
     onNameChanged: (newName: string) => void;
     onRenameCanceled: () => void;
 }
-// FIXME: when in renaming mode, the rename does not confirm when clicking on another note in the drawer
+// FIXME: when in renaming mode, the rename does not confirm when clicking on another note in the drawer (use onBlur)
 export default function EditableLabel({
     onNameChanged,
     onRenameCanceled,
