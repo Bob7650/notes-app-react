@@ -25,7 +25,7 @@ export default function Folder({ drawerFolder, onCallPopover }: Props) {
         drawerActions.makeAllStatic();
     };
 
-    const handleMouseDown = (
+    const handleMouseUp = (
         e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
     ) => {
         if (e.button === 0) {
@@ -50,7 +50,7 @@ export default function Folder({ drawerFolder, onCallPopover }: Props) {
                 drawerFolder.id === selectedFileId ? " selector-selected" : ""
             }`}
             onContextMenu={(e) => e.preventDefault()}
-            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
         >
             <div style={{ paddingLeft: 23 * drawerFolder.depth }} />
             <span
