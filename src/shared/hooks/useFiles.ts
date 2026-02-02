@@ -17,7 +17,7 @@ const createFileActions = (
         const defaultFile: DrawerFile = {
             id: String(Date.now()),
             title: type,
-            parentId: "root",
+            depth: 0,
             type: type,
         };
 
@@ -29,6 +29,7 @@ const createFileActions = (
                 ...prevState,
                 { id: defaultFile.id, content: defaultContent },
             ]);
+            return;
         }
         if (type === "folder") {
             setDrawerItems((prevState) => {
@@ -42,6 +43,7 @@ const createFileActions = (
                 newArr.splice(firstNoteInd, 0, defaultFile);
                 return newArr;
             });
+            return;
         }
     },
     remove: (id: string) => {
@@ -85,17 +87,6 @@ export function useFiles() {
         { id: string; content: string }[]
     >([]);
 
-    const childrenById = useMemo(() => {
-        const map: Map<string, DrawerFile[]> = new Map();
-
-        drawerItems.forEach((item) => {
-            const parentId = item.parentId;
-            map.set(parentId, [...(map.get(parentId) || []), item]);
-        });
-
-        return map;
-    }, [drawerItems]);
-
     const [lastRemovedId, setLastRemovedId] = useState<string | null>(null);
 
     const fileActions = useMemo(
@@ -133,7 +124,6 @@ export function useFiles() {
         drawerItems,
         contentById,
         titleById,
-        childrenById,
         lastRemovedId,
     };
 }
