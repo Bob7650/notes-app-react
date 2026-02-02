@@ -69,7 +69,7 @@ export default function FolderTree({ onCallPopover }: Props) {
     );
 
     const handleDragEnd = (e: DragEndEvent) => {
-        console.log(`Drag ended ${e.over?.id}`);
+        //console.log(`Drag ended ${e.over?.id}`);
         setValidDrops([]);
         if (e.over)
             fileActions.dropFileToFolder(

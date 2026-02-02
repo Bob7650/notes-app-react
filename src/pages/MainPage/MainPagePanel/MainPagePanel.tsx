@@ -20,11 +20,7 @@ export default function MainPagePanel() {
                         {selectedFileId ? (
                             <TextEditor
                                 noteId={selectedFileId}
-                                initialValue={
-                                    selectedFileId
-                                        ? contentById[selectedFileId]
-                                        : ""
-                                }
+                                initialValue={contentById[selectedFileId]}
                                 onChange={() => {}}
                                 onChangeDebounce={(updatedContent) => {
                                     fileActions.updateContent(

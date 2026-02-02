@@ -3,7 +3,7 @@ import "./TextEditor.style.css";
 
 interface Props {
     noteId: string;
-    initialValue: string;
+    initialValue?: string;
     onChange?: (newValue: string) => void;
     onChangeDebounce?: (newValue: string) => void;
     debounceDelay?: number;
@@ -18,12 +18,10 @@ export default function TextEditor({
 }: Props) {
     const timerRef = useRef<number | null>(null);
     const editorRef = useRef<HTMLDivElement | null>(null);
-    const lastIdRef = useRef(noteId);
 
     useEffect(() => {
-        if (editorRef.current && noteId !== lastIdRef.current) {
+        if (editorRef.current) {
             editorRef.current.innerText = initialValue;
-            lastIdRef.current = noteId;
         }
     }, [noteId]);
 

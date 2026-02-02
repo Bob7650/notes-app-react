@@ -23,13 +23,13 @@ const createFileActions = (
         };
 
         if (type === "note") {
-            const defaultContent: string = "Start typing here...";
+            const defaultContent = {
+                id: defaultFile.id,
+                content: "Start typing here...",
+            };
 
             setDrawerItems((prevState) => [...prevState, defaultFile]);
-            setFilesContents((prevState) => [
-                ...prevState,
-                { id: defaultFile.id, content: defaultContent },
-            ]);
+            setFilesContents((prevState) => [...prevState, defaultContent]);
             return;
         }
         if (type === "folder") {
@@ -89,6 +89,7 @@ const createFileActions = (
 
             if (!folderFile) {
                 console.error(
+                    "fileActions#dropFileToFolder()",
                     "Folder does not exist or trying to drop into child folder!",
                 );
                 return prevState;
@@ -103,12 +104,13 @@ const createFileActions = (
             const folderInd = prevStateCopy.indexOf(folderFile);
             prevStateCopy.splice(folderInd + 1, 0, ...subtreeItems);
 
-            console.log(
-                `StartInd: ${startInd}, 
-                EndInd: ${endInd}, 
-                FolderInd: ${folderInd}, 
-                depthOfRoot: ${subtreeItems[0].depth}`,
-            );
+            // console.log(
+            //     "fileActions#dropFileToFolder()\n",
+            //     `StartInd: ${startInd},\n` +
+            //         `EndInd: ${endInd},\n` +
+            //         `FolderInd: ${folderInd},\n` +
+            //         `depthOfRoot: ${subtreeItems[0].depth}`,
+            // );
             return prevStateCopy;
         });
     },
