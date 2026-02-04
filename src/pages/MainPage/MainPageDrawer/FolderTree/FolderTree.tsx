@@ -88,7 +88,7 @@ export default function FolderTree({ onCallPopover }: Props) {
     const [highlitghtedRange, setHighlightedRange] = useState<string[]>([]);
     const handleDragOver = (e: DragOverEvent) => {
         const overId = e.over?.id.toString() ?? "";
-        console.log(`Parent Id ${overId}`);
+        //console.log(`Parent Id ${overId}`);
         if (!overId) return;
 
         let parentFolderId = overId;

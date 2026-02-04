@@ -7,7 +7,10 @@ import {
 } from "react";
 import type { DrawerFile } from "../types/DrawerFile";
 import { getFromLocalStorage, saveToLocalStorage } from "../utils/StorageUtils";
-import { getFolderSubtreeRange } from "../utils/FolderTreeUtils";
+import {
+    getFolderSubtreeRange,
+    getParentFolderOf,
+} from "../utils/FolderTreeUtils";
 
 const DRAWER_ITEMS_KEY = "drawer_items";
 const FILES_CONTENTS_KEY = "files_contents";
@@ -111,9 +114,7 @@ const createFileActions = (
                 endInd - startInd + 1,
             );
 
-            const folderFile = prevStateCopy.find(
-                (item) => item.id === folderId,
-            );
+            let folderFile = prevStateCopy.find((item) => item.id === folderId);
 
             if (!folderFile) {
                 console.error(
@@ -123,8 +124,19 @@ const createFileActions = (
                 return prevState;
             }
 
-            // HACK: this is temporary
-            if (folderFile.type === "note") return prevState;
+            if (folderFile.type === "note") {
+                const parentFolderId = getParentFolderOf(
+                    folderFile.id,
+                    prevStateCopy,
+                );
+                folderFile = prevStateCopy.find(
+                    (item) => item.id === parentFolderId,
+                );
+
+                if (!folderFile) {
+                    return prevState;
+                }
+            }
 
             const depthDelta = folderFile.depth + 1 - subtreeItems[0].depth;
             subtreeItems = subtreeItems.map((item) => ({
