@@ -59,11 +59,12 @@ const createFileActions = (
     remove: (id: string) => {
         setDrawerItems((prevState) => {
             const itemToRemove = prevState.find((item) => item.id === id);
-            if (itemToRemove?.type === "folder") {
+            if (!itemToRemove) return prevState;
+            if (itemToRemove.type === "folder") {
                 const prevStateCopy = prevState.slice();
-                const { startInd, endInd } = getSubtreeRange(
-                    prevStateCopy,
+                const { startInd, endInd } = getFolderSubtreeRange(
                     itemToRemove.id,
+                    prevStateCopy,
                 );
                 prevStateCopy.splice(startInd, endInd - startInd + 1);
                 console.log(
@@ -71,7 +72,7 @@ const createFileActions = (
                 );
                 return prevStateCopy;
             }
-            return prevState.filter((item) => item.id === id);
+            return prevState.filter((item) => item.id !== id);
         });
         setFilesContents((prevState) =>
             prevState.filter((file) => file.id !== id),
@@ -98,7 +99,10 @@ const createFileActions = (
         setDrawerItems((prevState) => {
             const prevStateCopy = prevState.slice();
 
-            const { startInd, endInd } = getSubtreeRange(prevStateCopy, fileId);
+            const { startInd, endInd } = getFolderSubtreeRange(
+                fileId,
+                prevStateCopy,
+            );
 
             let subtreeItems = prevStateCopy.splice(
                 startInd,
@@ -214,19 +218,49 @@ export function useFiles() {
     };
 }
 
-export function getSubtreeRange(
-    files: DrawerFile[],
-    rootId: string,
+export function getFolderSubtreeRange(
+    folderId: string,
+    filesList: DrawerFile[],
 ): { startInd: number; endInd: number } {
-    const rootFile = files.find((item) => item.id === rootId);
-    if (!rootFile) return { startInd: 0, endInd: 0 };
+    let rootFolder = filesList.find((item) => item.id === folderId);
+    if (!rootFolder) return { startInd: 0, endInd: 0 };
 
-    const rootDepth = rootFile.depth;
-    const startInd = files.indexOf(rootFile);
+    const rootDepth = rootFolder.depth;
+    const startInd = filesList.indexOf(rootFolder);
 
     let endInd = startInd;
-    while (++endInd < files.length && files[endInd].depth > rootDepth);
+    while (++endInd < filesList.length && filesList[endInd].depth > rootDepth);
     endInd--;
 
     return { startInd: startInd, endInd: endInd };
+}
+
+/**
+ * Finds the parent folder of passed note or folder.
+ * @param fileId child id
+ * @param filesList file list
+ * @returns DrawerFile object of the parent folder, DrawerFile object with id: "root" when note in the root directory, null when the passed file does not exist
+ */
+export function findFolderOf(
+    fileId: string,
+    filesList: DrawerFile[],
+): DrawerFile | null {
+    const file = filesList.find((item) => fileId === item.id);
+    if (!file) return null;
+
+    const fileInd = filesList.indexOf(file);
+
+    let folderInd = fileInd;
+    while (--folderInd >= 0) {
+        if (
+            filesList[folderInd].type === "folder" &&
+            filesList[folderInd].depth === file.depth - 1
+        ) {
+            break;
+        }
+    }
+
+    if (folderInd === -1)
+        return { id: "root", title: "root", depth: -1, type: "folder" };
+    return filesList[folderInd];
 }

@@ -16,7 +16,6 @@ export default function MainPagePanel() {
                 <PanelTools />
                 <div className="note-section">
                     <div className="editor-wrapper">
-                        {/* TODO: Render Text Editor only when any card is selected */}
                         {selectedFileId ? (
                             <TextEditor
                                 noteId={selectedFileId}

@@ -8,9 +8,14 @@ import { FilesContext } from "../../../../shared/context/FilesContext/FilesConte
 interface Props {
     drawerFile: DrawerFile;
     onCallPopover: any;
+    highlighted: boolean;
 }
 
-export default function File({ drawerFile, onCallPopover }: Props) {
+export default function File({
+    drawerFile,
+    onCallPopover,
+    highlighted,
+}: Props) {
     const { mainActions, selectedFileId } = useContext(MainPanelContext)!;
     const { renamingId, drawerActions } = useContext(DrawerContext)!;
     const { fileActions } = useContext(FilesContext)!;
@@ -42,6 +47,8 @@ export default function File({ drawerFile, onCallPopover }: Props) {
             );
         }
     };
+
+    const style = { backgroundColor: highlighted ? "red" : "" };
 
     return (
         <div

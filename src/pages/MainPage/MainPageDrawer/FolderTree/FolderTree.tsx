@@ -15,8 +15,9 @@ import {
     useSensor,
     useSensors,
     type DragEndEvent,
+    type DragOverEvent,
 } from "@dnd-kit/core";
-import { getSubtreeRange } from "../../../../shared/hooks/useFiles";
+import { getFolderSubtreeRange } from "../../../../shared/hooks/useFiles";
 
 interface Props {
     onCallPopover: (anchor: Rect, callerId: string) => void;
@@ -49,9 +50,9 @@ export default function FolderTree({ onCallPopover }: Props) {
     const [validDrops, setValidDrops] = useState<DrawerFile[]>([]);
     const getValidDrops = useCallback(
         (draggedId: string): DrawerFile[] => {
-            const { startInd, endInd } = getSubtreeRange(
-                drawerItems,
+            const { startInd, endInd } = getFolderSubtreeRange(
                 draggedId,
+                drawerItems,
             );
             const validDrops = drawerItems.slice();
             validDrops.splice(startInd, endInd - startInd + 1);
@@ -78,6 +79,12 @@ export default function FolderTree({ onCallPopover }: Props) {
             );
     };
 
+    // TODO: do the highlighting stuff
+    const [highlitedRange, setHighlitedRange] = useState<string[]>([]);
+    const handleDragOver = (e: DragOverEvent) => {
+        // highlight all the stuff
+    };
+
     return (
         <DndContext
             sensors={sensors}
@@ -86,6 +93,7 @@ export default function FolderTree({ onCallPopover }: Props) {
                 //console.log("Calculate valid drops list");
                 setValidDrops(getValidDrops(e.active.id.toString()));
             }}
+            onDragOver={handleDragOver}
         >
             {visibleNodes.map((item) => (
                 <div key={item.id} className="drawer-item-wrapper">
@@ -101,6 +109,7 @@ export default function FolderTree({ onCallPopover }: Props) {
                                 <Folder
                                     drawerFolder={item}
                                     onCallPopover={onCallPopover}
+                                    highlighted={false}
                                 />
                             </Draggable>
                         </Droppable>
@@ -112,6 +121,7 @@ export default function FolderTree({ onCallPopover }: Props) {
                             <File
                                 drawerFile={item}
                                 onCallPopover={onCallPopover}
+                                highlighted={false}
                             />
                         </Draggable>
                     )}

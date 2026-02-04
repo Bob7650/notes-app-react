@@ -8,9 +8,14 @@ import EditableLabel from "../../../../shared/components/EditableLabel";
 interface Props {
     drawerFolder: DrawerFile;
     onCallPopover: any;
+    highlighted: boolean;
 }
 
-export default function Folder({ drawerFolder, onCallPopover }: Props) {
+export default function Folder({
+    drawerFolder,
+    onCallPopover,
+    highlighted,
+}: Props) {
     const { selectedFileId } = useContext(MainPanelContext)!;
     const { renamingId, drawerActions, expandedId } =
         useContext(DrawerContext)!;
@@ -44,6 +49,8 @@ export default function Folder({ drawerFolder, onCallPopover }: Props) {
         }
     };
 
+    const style = { backgroundColor: highlighted ? "red" : "" };
+
     return (
         <div
             className={`selector-wrapper${
@@ -51,6 +58,7 @@ export default function Folder({ drawerFolder, onCallPopover }: Props) {
             }`}
             onContextMenu={(e) => e.preventDefault()}
             onMouseUp={handleMouseUp}
+            style={style}
         >
             <div style={{ paddingLeft: 23 * drawerFolder.depth }} />
             <span
