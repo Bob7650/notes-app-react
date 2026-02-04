@@ -56,11 +56,23 @@ const createFileActions = (
             return;
         }
     },
-    // TODO: remove a folder with all of its children
     remove: (id: string) => {
-        setDrawerItems((prevState) =>
-            prevState.filter((item) => item.id !== id),
-        );
+        setDrawerItems((prevState) => {
+            const itemToRemove = prevState.find((item) => item.id === id);
+            if (itemToRemove?.type === "folder") {
+                const prevStateCopy = prevState.slice();
+                const { startInd, endInd } = getSubtreeRange(
+                    prevStateCopy,
+                    itemToRemove.id,
+                );
+                prevStateCopy.splice(startInd, endInd - startInd + 1);
+                console.log(
+                    `Removing from: ${startInd} amount: ${endInd - startInd + 1}`,
+                );
+                return prevStateCopy;
+            }
+            return prevState.filter((item) => item.id === id);
+        });
         setFilesContents((prevState) =>
             prevState.filter((file) => file.id !== id),
         );
