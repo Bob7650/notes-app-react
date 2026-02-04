@@ -123,6 +123,9 @@ const createFileActions = (
                 return prevState;
             }
 
+            // HACK: this is temporary
+            if (folderFile.type === "note") return prevState;
+
             const depthDelta = folderFile.depth + 1 - subtreeItems[0].depth;
             subtreeItems = subtreeItems.map((item) => ({
                 ...item,

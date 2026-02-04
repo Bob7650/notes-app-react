@@ -23,7 +23,10 @@ export function getFolderSubtreeRange(
  * @param filesList file list
  * @returns id of the parent folder ("root" if in root folder) or empty string when the file does not exist
  */
-export function findFolderOf(fileId: string, filesList: DrawerFile[]): string {
+export function getParentFolderOf(
+    fileId: string,
+    filesList: DrawerFile[],
+): string {
     const file = filesList.find((item) => fileId === item.id);
     if (!file) {
         console.error(
@@ -47,4 +50,17 @@ export function findFolderOf(fileId: string, filesList: DrawerFile[]): string {
 
     if (folderInd === -1) return "root";
     return filesList[folderInd].id;
+}
+
+export function getIdsInRange(
+    startInd: number,
+    endInd: number,
+    fileList: DrawerFile[],
+): string[] {
+    const idList: string[] = [];
+    for (let i = startInd; i <= endInd; i++) {
+        idList.push(fileList[i].id);
+    }
+
+    return idList;
 }

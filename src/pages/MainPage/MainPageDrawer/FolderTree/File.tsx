@@ -57,6 +57,7 @@ export default function File({
             }`}
             onContextMenu={(e) => e.preventDefault()}
             onMouseUp={handleMouseUp}
+            style={style}
         >
             <div style={{ paddingLeft: 23 * drawerFile.depth }} />
             <EditableLabel

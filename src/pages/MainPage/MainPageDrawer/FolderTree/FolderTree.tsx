@@ -17,7 +17,11 @@ import {
     type DragEndEvent,
     type DragOverEvent,
 } from "@dnd-kit/core";
-import { getFolderSubtreeRange } from "../../../../shared/utils/FolderTreeUtils";
+import {
+    getFolderSubtreeRange,
+    getIdsInRange,
+    getParentFolderOf,
+} from "../../../../shared/utils/FolderTreeUtils";
 
 interface Props {
     onCallPopover: (anchor: Rect, callerId: string) => void;
@@ -72,6 +76,7 @@ export default function FolderTree({ onCallPopover }: Props) {
     const handleDragEnd = (e: DragEndEvent) => {
         //console.log(`Drag ended ${e.over?.id}`);
         setValidDrops([]);
+        setHighlightedRange([]);
         if (e.over)
             fileActions.dropFileToFolder(
                 e.active.id.toString(),
@@ -80,9 +85,24 @@ export default function FolderTree({ onCallPopover }: Props) {
     };
 
     // TODO: do the highlighting stuff
-    const [highlitedRange, setHighlitedRange] = useState<string[]>([]);
+    const [highlitghtedRange, setHighlightedRange] = useState<string[]>([]);
     const handleDragOver = (e: DragOverEvent) => {
-        // highlight all the stuff
+        const overId = e.over?.id.toString() ?? "";
+        console.log(`Parent Id ${overId}`);
+        if (!overId) return;
+
+        let parentFolderId = overId;
+        if (
+            drawerItems.find((item) => item.id === parentFolderId)?.type ===
+            "note"
+        ) {
+            parentFolderId = getParentFolderOf(parentFolderId, drawerItems);
+        }
+        const { startInd, endInd } = getFolderSubtreeRange(
+            parentFolderId,
+            drawerItems,
+        );
+        setHighlightedRange(getIdsInRange(startInd, endInd, drawerItems));
     };
 
     return (
@@ -109,21 +129,30 @@ export default function FolderTree({ onCallPopover }: Props) {
                                 <Folder
                                     drawerFolder={item}
                                     onCallPopover={onCallPopover}
-                                    highlighted={false}
+                                    highlighted={highlitghtedRange.includes(
+                                        item.id,
+                                    )}
                                 />
                             </Draggable>
                         </Droppable>
                     ) : (
-                        <Draggable
+                        <Droppable
                             id={item.id}
-                            canDrag={item.id !== renamingId}
+                            canDropInto={validDrops.includes(item)}
                         >
-                            <File
-                                drawerFile={item}
-                                onCallPopover={onCallPopover}
-                                highlighted={false}
-                            />
-                        </Draggable>
+                            <Draggable
+                                id={item.id}
+                                canDrag={item.id !== renamingId}
+                            >
+                                <File
+                                    drawerFile={item}
+                                    onCallPopover={onCallPopover}
+                                    highlighted={highlitghtedRange.includes(
+                                        item.id,
+                                    )}
+                                />
+                            </Draggable>
+                        </Droppable>
                     )}
                 </div>
             ))}
