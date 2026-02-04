@@ -21,14 +21,17 @@ export function getFolderSubtreeRange(
  * Finds the parent folder of passed note or folder.
  * @param fileId child id
  * @param filesList file list
- * @returns DrawerFile object of the parent folder, DrawerFile object with id: "root" when note in the root directory, null when the passed file does not exist
+ * @returns id of the parent folder ("root" if in root folder) or empty string when the file does not exist
  */
-export function findFolderOf(
-    fileId: string,
-    filesList: DrawerFile[],
-): DrawerFile | null {
+export function findFolderOf(fileId: string, filesList: DrawerFile[]): string {
     const file = filesList.find((item) => fileId === item.id);
-    if (!file) return null;
+    if (!file) {
+        console.error(
+            "FolderTreeUtils#findFolderOf()",
+            "The file does not exist",
+        );
+        return "";
+    }
 
     const fileInd = filesList.indexOf(file);
 
@@ -42,7 +45,6 @@ export function findFolderOf(
         }
     }
 
-    if (folderInd === -1)
-        return { id: "root", title: "root", depth: -1, type: "folder" };
-    return filesList[folderInd];
+    if (folderInd === -1) return "root";
+    return filesList[folderInd].id;
 }
