@@ -112,13 +112,22 @@ const createFileActions = (
             }));
 
             let insertInd = prevStateCopy.indexOf(folderFile);
-            if (subtreeItems[0].type === "folder") {
-                insertInd++;
-            } else {
+            ++insertInd;
+
+            if (subtreeItems[0].type === "note") {
                 while (
-                    prevStateCopy[++insertInd].type !== "note" ||
-                    prevStateCopy[insertInd].depth > subtreeItems[0].depth
-                );
+                    insertInd !== prevStateCopy.length &&
+                    prevStateCopy[insertInd].depth >= subtreeItems[0].depth
+                ) {
+                    if (
+                        prevStateCopy[insertInd].type === "note" &&
+                        prevStateCopy[insertInd].depth === subtreeItems[0].depth
+                    ) {
+                        break;
+                    } else {
+                        ++insertInd;
+                    }
+                }
             }
 
             prevStateCopy.splice(insertInd, 0, ...subtreeItems);
