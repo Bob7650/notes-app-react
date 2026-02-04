@@ -17,7 +17,7 @@ import {
     type DragEndEvent,
     type DragOverEvent,
 } from "@dnd-kit/core";
-import { getFolderSubtreeRange } from "../../../../shared/hooks/useFiles";
+import { getFolderSubtreeRange } from "../../../../shared/utils/FolderTreeUtils";
 
 interface Props {
     onCallPopover: (anchor: Rect, callerId: string) => void;
