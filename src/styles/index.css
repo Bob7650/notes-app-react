@@ -13,11 +13,14 @@
     --button-default-hover: #e4e4e4;
 
     --text-default: #1e1e1e;
+    --text-debug: #24dd3d;
 
     --round-rad-default: 4px;
 
     --icon-danger: #c24848;
     --text-danger: #a03b3b;
+
+    --highlight-color: #ececec;
 }
 
 .bordered {
@@ -28,7 +31,11 @@
 }
 
 .material-symbols-outlined {
-    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 20;
+    font-variation-settings:
+        "FILL" 0,
+        "wght" 400,
+        "GRAD" 0,
+        "opsz" 20;
     color: var(--icon-secondary);
 }
 

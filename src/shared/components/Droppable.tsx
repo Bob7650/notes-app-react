@@ -13,7 +13,7 @@ export default function Droppable({ id, canDropInto, children }: Props) {
         disabled: !canDropInto,
     });
     const style = {
-        color: canDropInto ? "green" : "red",
+        color: canDropInto ? "var(--text-default)" : "var(--text-debug)",
     };
 
     return (

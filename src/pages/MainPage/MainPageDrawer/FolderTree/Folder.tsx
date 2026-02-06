@@ -49,38 +49,43 @@ export default function Folder({
         }
     };
 
-    const style = { backgroundColor: highlighted ? "red" : "" };
+    const style = {
+        backgroundColor: highlighted ? "var(--highlight-color)" : "",
+    };
 
     return (
-        <div
-            className={`selector-wrapper${
-                drawerFolder.id === selectedFileId ? " selector-selected" : ""
-            }`}
-            onContextMenu={(e) => e.preventDefault()}
-            onMouseUp={handleMouseUp}
-            style={style}
-        >
-            <div style={{ paddingLeft: 23 * drawerFolder.depth }} />
-            <span
-                className="material-symbols-outlined"
-                style={{
-                    position: "relative",
-                    top: 1,
-                    left: -3,
-                }}
+        <div className="item-highlight-layer" style={style}>
+            <div
+                className={`selector-wrapper${
+                    drawerFolder.id === selectedFileId
+                        ? " selector-selected"
+                        : ""
+                }`}
+                onContextMenu={(e) => e.preventDefault()}
+                onMouseUp={handleMouseUp}
             >
-                {expandedId.includes(drawerFolder.id)
-                    ? "arrow_drop_down"
-                    : "arrow_right"}
-            </span>
-            <EditableLabel
-                initialValue={drawerFolder.title}
-                canEdit={drawerFolder.id === renamingId}
-                onNameChanged={(newValue) =>
-                    handleNameChanged(newValue, drawerFolder.id)
-                }
-                onRenameCanceled={handleRenameCanceled}
-            />
+                <div style={{ paddingLeft: 23 * drawerFolder.depth }} />
+                <span
+                    className="material-symbols-outlined"
+                    style={{
+                        position: "relative",
+                        top: 1,
+                        left: -3,
+                    }}
+                >
+                    {expandedId.includes(drawerFolder.id)
+                        ? "arrow_drop_down"
+                        : "arrow_right"}
+                </span>
+                <EditableLabel
+                    initialValue={drawerFolder.title}
+                    canEdit={drawerFolder.id === renamingId}
+                    onNameChanged={(newValue) =>
+                        handleNameChanged(newValue, drawerFolder.id)
+                    }
+                    onRenameCanceled={handleRenameCanceled}
+                />
+            </div>
         </div>
     );
 }

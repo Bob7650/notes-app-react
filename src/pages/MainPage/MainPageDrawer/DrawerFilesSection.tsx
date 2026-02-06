@@ -31,7 +31,7 @@ export default function DrawerFilesSection() {
 
     return (
         <>
-            <div className="folders-section">
+            <div className="folder-tree-section">
                 <FolderTree onCallPopover={handleDisplayPopover} />
             </div>
 

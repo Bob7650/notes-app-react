@@ -61,14 +61,16 @@
     gap: 16px;
 }
 
-.folders-section,
-.notes-section {
+.folder-tree-section {
     display: flex;
     flex-direction: column;
 
     padding-inline: 16px;
     padding-block: 2px;
-    gap: 4px;
+}
+
+.item-highlight-layer {
+    padding-block: 2px;
 }
 
 .cards-section {

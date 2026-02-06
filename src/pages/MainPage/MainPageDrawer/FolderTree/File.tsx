@@ -48,26 +48,29 @@ export default function File({
         }
     };
 
-    const style = { backgroundColor: highlighted ? "red" : "" };
+    const style = {
+        backgroundColor: highlighted ? "var(--highlight-color)" : "",
+    };
 
     return (
-        <div
-            className={`selector-wrapper${
-                drawerFile.id === selectedFileId ? " selector-selected" : ""
-            }`}
-            onContextMenu={(e) => e.preventDefault()}
-            onMouseUp={handleMouseUp}
-            style={style}
-        >
-            <div style={{ paddingLeft: 23 * drawerFile.depth }} />
-            <EditableLabel
-                initialValue={drawerFile.title}
-                canEdit={drawerFile.id === renamingId}
-                onNameChanged={(newValue) =>
-                    handleNameChanged(newValue, drawerFile.id)
-                }
-                onRenameCanceled={handleRenameCanceled}
-            />
+        <div className="item-highlight-layer" style={style}>
+            <div
+                className={`selector-wrapper${
+                    drawerFile.id === selectedFileId ? " selector-selected" : ""
+                }`}
+                onContextMenu={(e) => e.preventDefault()}
+                onMouseUp={handleMouseUp}
+            >
+                <div style={{ paddingLeft: 23 * drawerFile.depth }} />
+                <EditableLabel
+                    initialValue={drawerFile.title}
+                    canEdit={drawerFile.id === renamingId}
+                    onNameChanged={(newValue) =>
+                        handleNameChanged(newValue, drawerFile.id)
+                    }
+                    onRenameCanceled={handleRenameCanceled}
+                />
+            </div>
         </div>
     );
 }
