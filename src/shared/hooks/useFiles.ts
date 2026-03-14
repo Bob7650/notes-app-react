@@ -100,6 +100,7 @@ const createFileActions = (
             ),
         );
     },
+    // TODO: prevent from dropping into self parent
     dropFileToFolder: (fileId: string, folderId: string): void => {
         setDrawerItems((prevState) => {
             const prevStateCopy = prevState.slice();

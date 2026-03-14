@@ -54,6 +54,8 @@ export default function FolderTree({ onCallPopover }: Props) {
     const [validDrops, setValidDrops] = useState<DrawerFile[]>([]);
     const getValidDrops = useCallback(
         (draggedId: string): DrawerFile[] => {
+            // TODO: make so that can't drop inside parent folder but can drop into other folders if note
+            // The only restraint the note should have is about dropping into it's own folder!
             const { startInd, endInd } = getFolderSubtreeRange(
                 draggedId,
                 drawerItems,
