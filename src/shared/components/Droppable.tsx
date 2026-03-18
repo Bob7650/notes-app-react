@@ -8,12 +8,12 @@ interface Props {
 }
 
 export default function Droppable({ id, canDropInto, children }: Props) {
-    const { isOver, setNodeRef } = useDroppable({
+    const { setNodeRef } = useDroppable({
         id: id,
         disabled: !canDropInto,
     });
     const style = {
-        color: canDropInto ? "var(--text-default)" : "var(--text-debug)",
+        color: !canDropInto ? "var(--text-default)" : "var(--text-debug)",
     };
 
     return (

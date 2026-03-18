@@ -1,14 +1,19 @@
 import type { DrawerFile } from "../types/DrawerFile";
 
-export function getFolderSubtreeRange(
-    folderId: string,
+export function getFileSpan(
+    file: DrawerFile,
     filesList: DrawerFile[],
 ): { startInd: number; endInd: number } {
-    let rootFolder = filesList.find((item) => item.id === folderId);
-    if (!rootFolder) return { startInd: 0, endInd: 0 };
+    if (file.id === "root")
+        return { startInd: 0, endInd: filesList.length - 1 };
 
-    const rootDepth = rootFolder.depth;
-    const startInd = filesList.indexOf(rootFolder);
+    if (file.type === "note") {
+        const fileInd = filesList.indexOf(file);
+        return { startInd: fileInd, endInd: fileInd };
+    }
+
+    const rootDepth = file.depth;
+    const startInd = filesList.indexOf(file);
 
     let endInd = startInd;
     while (++endInd < filesList.length && filesList[endInd].depth > rootDepth);
@@ -17,25 +22,17 @@ export function getFolderSubtreeRange(
     return { startInd: startInd, endInd: endInd };
 }
 
-/**
- * Finds the parent folder of passed note or folder.
- * @param fileId child id
- * @param filesList file list
- * @returns id of the parent folder ("root" if in root folder) or empty string when the file does not exist
- */
 export function getParentFolderOf(
-    fileId: string,
+    file: DrawerFile,
     filesList: DrawerFile[],
-): string {
-    const file = filesList.find((item) => fileId === item.id);
-    if (!file) {
-        console.error(
-            "FolderTreeUtils#findFolderOf()",
-            "The file does not exist",
-        );
-        return "";
-    }
-
+): DrawerFile {
+    // if (fileId === "root") {
+    //     console.error(
+    //         "FolderTreeUtils#getParentFolderIdOf()",
+    //         "Trying to get the parent of root",
+    //     );
+    //     return "";
+    // }
     const fileInd = filesList.indexOf(file);
 
     let folderInd = fileInd;
@@ -48,8 +45,42 @@ export function getParentFolderOf(
         }
     }
 
-    if (folderInd === -1) return "root";
-    return filesList[folderInd].id;
+    if (folderInd === -1) return { id: "root", title: "", depth: -1, type: "folder" };
+    return filesList[folderInd];
+}
+
+export function getSiblingNotesRange(
+    fileId: string,
+    filesList: DrawerFile[],
+): { startInd: number; endInd: number } {
+    const file = filesList.find((item) => fileId === item.id);
+    if (!file) {
+        console.error(
+            "FolderTreeUtils#getSiblingNotesRange()",
+            "The file does not exist",
+        );
+        return { startInd: -1, endInd: -1 };
+    }
+
+    const fileInd = filesList.indexOf(file);
+
+    let startInd = fileInd;
+    while (
+        --startInd > 0 &&
+        filesList[startInd].type === "note" &&
+        filesList[startInd].depth === file.depth
+    );
+    ++startInd;
+
+    let endInd = fileInd;
+    while (
+        ++endInd < filesList.length &&
+        filesList[endInd].type === "note" &&
+        filesList[endInd].depth === file.depth
+    );
+    --endInd;
+
+    return { startInd, endInd };
 }
 
 export function getIdsInRange(
@@ -63,4 +94,38 @@ export function getIdsInRange(
     }
 
     return idList;
+}
+
+export function getValidDrops(
+    fileId: string,
+    fileList: DrawerFile[],
+): DrawerFile[] {
+    const file = fileList.find((item) => item.id === fileId);
+    if (!file) {
+        console.error(
+            "FolderTreeUtils#getValidDrops()",
+            "Item does not exist!",
+        );
+        return [];
+    }
+
+    const invalidDrops: DrawerFile[] = [];
+
+    if (file.type === "note") {
+        const folder = getParentFolderOf(file, fileList);
+        const { startInd, endInd } = getFileSpan(folder, fileList);
+        invalidDrops.push(folder);
+        for (let i = startInd + 1; i <= endInd; i++) {
+            if (fileList[i].type === "note" && fileList[i].depth === file.depth)
+                invalidDrops.push(fileList[i]);
+        }
+    } else {
+        const { startInd, endInd } = getFileSpan(file, fileList);
+        for (let i = startInd; i <= endInd; i++) {
+            invalidDrops.push(fileList[i]);
+        }
+    }
+
+    const validDrops = fileList.filter((elem) => !invalidDrops.includes(elem));
+    return validDrops;
 }

@@ -8,8 +8,8 @@ import {
 import type { DrawerFile } from "../types/DrawerFile";
 import { getFromLocalStorage, saveToLocalStorage } from "../utils/StorageUtils";
 import {
-    getFolderSubtreeRange,
-    getParentFolderOf,
+    getFileSpan,
+    getValidDrops,
 } from "../utils/FolderTreeUtils";
 
 const DRAWER_ITEMS_KEY = "drawer_items";
@@ -67,8 +67,8 @@ const createFileActions = (
             if (!itemToRemove) return prevState;
             if (itemToRemove.type === "folder") {
                 const prevStateCopy = prevState.slice();
-                const { startInd, endInd } = getFolderSubtreeRange(
-                    itemToRemove.id,
+                const { startInd, endInd } = getFileSpan(
+                    itemToRemove,
                     prevStateCopy,
                 );
                 prevStateCopy.splice(startInd, endInd - startInd + 1);
@@ -100,63 +100,69 @@ const createFileActions = (
             ),
         );
     },
-    // TODO: prevent from dropping into self parent
     dropFileToFolder: (fileId: string, folderId: string): void => {
         setDrawerItems((prevState) => {
             const prevStateCopy = prevState.slice();
 
-            const { startInd, endInd } = getFolderSubtreeRange(
-                fileId,
-                prevStateCopy,
-            );
-
-            let subtreeItems = prevStateCopy.splice(
-                startInd,
-                endInd - startInd + 1,
-            );
-
-            let folderFile = prevStateCopy.find((item) => item.id === folderId);
-
-            if (!folderFile) {
+            const file = prevStateCopy.find((item) => item.id === fileId);
+            if (!file) {
                 console.error(
-                    "fileActions#dropFileToFolder()",
-                    "Folder does not exist or trying to drop into child folder!",
+                    "useFiles#dropFileToFolder()",
+                    "File does note exist!",
                 );
                 return prevState;
             }
 
-            if (folderFile.type === "note") {
-                const parentFolderId = getParentFolderOf(
-                    folderFile.id,
-                    prevStateCopy,
+            const folder = prevStateCopy.find((item) => item.id === folderId);
+            if (!folder) {
+                console.error(
+                    "useFiles#dropFileToFolder()",
+                    "Folder does note exist!",
                 );
-                folderFile = prevStateCopy.find(
-                    (item) => item.id === parentFolderId,
-                );
-
-                if (!folderFile) {
-                    return prevState;
-                }
+                return prevState;
             }
 
-            const depthDelta = folderFile.depth + 1 - subtreeItems[0].depth;
-            subtreeItems = subtreeItems.map((item) => ({
+            if (folder.type !== "folder") {
+                console.error(
+                    "useFiles#dropFileToFolder()",
+                    "Folder is a note!",
+                );
+                return prevState;
+            }
+
+            const validDrops = getValidDrops(fileId, prevStateCopy);
+
+            if (!validDrops.includes(folder)) {
+                console.error("useFiles#dropFileToFolder()", "Invalid drop!");
+                return prevState;
+            }
+
+            const { startInd, endInd } = getFileSpan(file, prevStateCopy);
+
+            const subtreeItems = prevStateCopy.splice(
+                startInd,
+                endInd - startInd + 1,
+            );
+
+            const normalizedSubtreeItems = subtreeItems.map((item) => ({
                 ...item,
-                depth: item.depth + depthDelta,
+                depth: item.depth - file.depth,
             }));
 
-            let insertInd = prevStateCopy.indexOf(folderFile);
+            const adjustedSubtreeItems = normalizedSubtreeItems.map(item => ({
+                ...item,
+                depth: item.depth + folder.depth + 1
+            }));
+
+            let insertInd = prevStateCopy.indexOf(folder);
             ++insertInd;
 
-            if (subtreeItems[0].type === "note") {
-                while (
-                    insertInd !== prevStateCopy.length &&
-                    prevStateCopy[insertInd].depth >= subtreeItems[0].depth
-                ) {
-                    if (
-                        prevStateCopy[insertInd].type === "note" &&
-                        prevStateCopy[insertInd].depth === subtreeItems[0].depth
-                    ) {
+            if (file.type === "note") {
+                // TODO: change this to for loop with getFileSpan() for readablility
+                while (insertInd !== prevStateCopy.length &&
+                    prevStateCopy[insertInd].depth >= adjustedSubtreeItems[0].depth) {
+                    if (prevStateCopy[insertInd].type === "note" &&
+                    prevStateCopy[insertInd].depth === adjustedSubtreeItems[0].depth) {
                         break;
                     } else {
                         ++insertInd;
@@ -164,15 +170,14 @@ const createFileActions = (
                 }
             }
 
-            prevStateCopy.splice(insertInd, 0, ...subtreeItems);
+            prevStateCopy.splice(insertInd, 0, ...adjustedSubtreeItems);
 
-            // console.log(
-            //     "fileActions#dropFileToFolder()\n",
-            //     `StartInd: ${startInd},\n` +
-            //         `EndInd: ${endInd},\n` +
-            //         `FolderInd: ${folderInd},\n` +
-            //         `depthOfRoot: ${subtreeItems[0].depth}`,
-            // );
+            console.log(
+                "fileActions#dropFileToFolder()\n",
+                `StartInd: ${startInd},\n` +
+                    `EndInd: ${endInd},\n` +
+                    `depthOfRoot: ${adjustedSubtreeItems[0].depth}`,
+            );
             return prevStateCopy;
         });
     },

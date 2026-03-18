@@ -1,4 +1,4 @@
-import { useCallback, useContext, useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { DrawerContext } from "../../../../shared/context/DrawerContext/DrawerContext";
 import type { Rect } from "../../../../shared/types/Rect";
 import { FilesContext } from "../../../../shared/context/FilesContext/FilesContext";
@@ -18,9 +18,10 @@ import {
     type DragOverEvent,
 } from "@dnd-kit/core";
 import {
-    getFolderSubtreeRange,
+    getFileSpan,
     getIdsInRange,
     getParentFolderOf,
+    getValidDrops,
 } from "../../../../shared/utils/FolderTreeUtils";
 
 interface Props {
@@ -30,6 +31,17 @@ interface Props {
 export default function FolderTree({ onCallPopover }: Props) {
     const { expandedId, renamingId } = useContext(DrawerContext)!;
     const { drawerItems, fileActions } = useContext(FilesContext)!;
+
+    const [validDrops, setValidDrops] = useState<DrawerFile[]>([]);
+    const [highlitghtedRange, setHighlightedRange] = useState<string[]>([]);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 10,
+            },
+        }),
+    );
 
     const visibleNodes = useMemo(() => {
         const result: DrawerFile[] = [];
@@ -51,57 +63,38 @@ export default function FolderTree({ onCallPopover }: Props) {
         return result;
     }, [drawerItems, expandedId]);
 
-    const [validDrops, setValidDrops] = useState<DrawerFile[]>([]);
-    const getValidDrops = useCallback(
-        (draggedId: string): DrawerFile[] => {
-            // TODO: make so that can't drop inside parent folder but can drop into other folders if note
-            // The only restraint the note should have is about dropping into it's own folder!
-            const { startInd, endInd } = getFolderSubtreeRange(
-                draggedId,
-                drawerItems,
-            );
-            const validDrops = drawerItems.slice();
-            validDrops.splice(startInd, endInd - startInd + 1);
-            return validDrops;
-        },
-        [drawerItems],
-    );
-
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 10,
-            },
-        }),
-    );
-
     const handleDragEnd = (e: DragEndEvent) => {
-        //console.log(`Drag ended ${e.over?.id}`);
         setValidDrops([]);
         setHighlightedRange([]);
-        if (e.over)
-            fileActions.dropFileToFolder(
-                e.active.id.toString(),
-                e.over.id.toString(),
-            );
+
+        const overItem = drawerItems.find((item) => item.id === e.over?.id);
+        if (!overItem) return;
+
+        let parentFolder: DrawerFile | undefined = undefined;
+        if (overItem.type === "note") {
+            parentFolder = getParentFolderOf(overItem, drawerItems);
+        }
+
+        fileActions.dropFileToFolder(
+            e.active.id.toString(),
+            parentFolder?.id ?? overItem.id,
+        );
     };
 
-    // TODO: do the highlighting stuff
-    const [highlitghtedRange, setHighlightedRange] = useState<string[]>([]);
     const handleDragOver = (e: DragOverEvent) => {
-        const overId = e.over?.id.toString() ?? "";
-        //console.log(`Parent Id ${overId}`);
-        if (!overId) return;
-
-        let parentFolderId = overId;
-        if (
-            drawerItems.find((item) => item.id === parentFolderId)?.type ===
-            "note"
-        ) {
-            parentFolderId = getParentFolderOf(parentFolderId, drawerItems);
+        const overItem = drawerItems.find((item) => item.id === e.over?.id);
+        if (!overItem) {
+            setHighlightedRange([]);
+            return;
         }
-        const { startInd, endInd } = getFolderSubtreeRange(
-            parentFolderId,
+
+        let parentFolder: DrawerFile | undefined = undefined;
+        if (overItem.type === "note") {
+            parentFolder = getParentFolderOf(overItem, drawerItems);
+        }
+
+        const { startInd, endInd } = getFileSpan(
+            parentFolder ?? overItem,
             drawerItems,
         );
         setHighlightedRange(getIdsInRange(startInd, endInd, drawerItems));
@@ -112,8 +105,9 @@ export default function FolderTree({ onCallPopover }: Props) {
             sensors={sensors}
             onDragEnd={handleDragEnd}
             onDragStart={(e) => {
-                //console.log("Calculate valid drops list");
-                setValidDrops(getValidDrops(e.active.id.toString()));
+                setValidDrops(
+                    getValidDrops(e.active.id.toString(), drawerItems),
+                );
             }}
             onDragOver={handleDragOver}
         >

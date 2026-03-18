@@ -29,6 +29,7 @@ export default function MainPagePanel() {
                                 }}
                             />
                         ) : (
+                            //TODO: Replace with a welcome screen
                             <p>EFN</p>
                         )}
                     </div>
