@@ -17,7 +17,7 @@ const FILES_CONTENTS_KEY = "files_contents";
 
 const createFileActions = (
     setDrawerItems: Dispatch<SetStateAction<DrawerFile[]>>,
-    setLastRemovedId: Dispatch<SetStateAction<string | null>>,
+    setLastRemovedIds: Dispatch<SetStateAction<string[]>>,
     setFilesContents: Dispatch<
         SetStateAction<
             {
@@ -60,7 +60,6 @@ const createFileActions = (
             return;
         }
     },
-    // FIXME: when removing a folder, children files not closing
     remove: (id: string) => {
         setDrawerItems((prevState) => {
             const itemToRemove = prevState.find((item) => item.id === id);
@@ -71,7 +70,7 @@ const createFileActions = (
                     itemToRemove,
                     prevStateCopy,
                 );
-                prevStateCopy.splice(startInd, endInd - startInd + 1);
+                setLastRemovedIds(prevStateCopy.splice(startInd, endInd - startInd + 1).map((item) => item.id));
                 console.log(
                     `Removing from: ${startInd} amount: ${endInd - startInd + 1}`,
                 );
@@ -79,10 +78,6 @@ const createFileActions = (
             }
             return prevState.filter((item) => item.id !== id);
         });
-        setFilesContents((prevState) =>
-            prevState.filter((file) => file.id !== id),
-        );
-        setLastRemovedId(id);
     },
     rename: (id: string, title: string): void => {
         setDrawerItems((prevState) =>
@@ -192,6 +187,8 @@ export function useFiles() {
         { id: string; content: string }[]
     >(getFromLocalStorage<{ id: string; content: string }>(FILES_CONTENTS_KEY));
 
+    const [lastRemovedIds, setLastRemovedIds] = useState<string[]>([]);
+
     useEffect(() => {
         saveToLocalStorage(DRAWER_ITEMS_KEY, drawerItems);
     }, [drawerItems]);
@@ -200,13 +197,15 @@ export function useFiles() {
         localStorage.setItem(FILES_CONTENTS_KEY, JSON.stringify(filesContents));
     }, [filesContents]);
 
-    const [lastRemovedId, setLastRemovedId] = useState<string | null>(null);
+    useEffect(()=>{
+        setFilesContents((prevState) => prevState.filter((item) => !lastRemovedIds.includes(item.id)))
+    }, [lastRemovedIds]);
 
     const fileActions = useMemo(
         () =>
             createFileActions(
                 setDrawerItems,
-                setLastRemovedId,
+                setLastRemovedIds,
                 setFilesContents,
             ),
         [],
@@ -237,6 +236,6 @@ export function useFiles() {
         drawerItems,
         contentById,
         titleById,
-        lastRemovedId,
+        lastRemovedIds,
     };
 }

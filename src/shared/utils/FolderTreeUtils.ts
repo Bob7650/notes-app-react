@@ -26,13 +26,6 @@ export function getParentFolderOf(
     file: DrawerFile,
     filesList: DrawerFile[],
 ): DrawerFile {
-    // if (fileId === "root") {
-    //     console.error(
-    //         "FolderTreeUtils#getParentFolderIdOf()",
-    //         "Trying to get the parent of root",
-    //     );
-    //     return "";
-    // }
     const fileInd = filesList.indexOf(file);
 
     let folderInd = fileInd;
