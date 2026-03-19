@@ -35,6 +35,8 @@ const createFileActions = (
             type: type,
         };
 
+        defaultFile.title = defaultFile.id;
+
         if (type === "note") {
             const defaultContent = {
                 id: defaultFile.id,
@@ -95,27 +97,9 @@ const createFileActions = (
             ),
         );
     },
-    dropFileToFolder: (fileId: string, folderId: string): void => {
+    dropFileToFolder: (file: DrawerFile, folder: DrawerFile): void => {
         setDrawerItems((prevState) => {
             const prevStateCopy = prevState.slice();
-
-            const file = prevStateCopy.find((item) => item.id === fileId);
-            if (!file) {
-                console.error(
-                    "useFiles#dropFileToFolder()",
-                    "File does note exist!",
-                );
-                return prevState;
-            }
-
-            const folder = prevStateCopy.find((item) => item.id === folderId);
-            if (!folder) {
-                console.error(
-                    "useFiles#dropFileToFolder()",
-                    "Folder does note exist!",
-                );
-                return prevState;
-            }
 
             if (folder.type !== "folder") {
                 console.error(
@@ -125,9 +109,9 @@ const createFileActions = (
                 return prevState;
             }
 
-            const validDrops = getValidDrops(fileId, prevStateCopy);
+            const validDrops = getValidDrops(file.id, prevStateCopy);
 
-            if (!validDrops.includes(folder)) {
+            if (!validDrops.includes(folder) && folder.id !== "root") {
                 console.error("useFiles#dropFileToFolder()", "Invalid drop!");
                 return prevState;
             }
@@ -179,9 +163,13 @@ const createFileActions = (
 });
 
 export function useFiles() {
-    // save this
-    const [drawerItems, setDrawerItems] = useState<DrawerFile[]>(
-        getFromLocalStorage<DrawerFile>(DRAWER_ITEMS_KEY),
+    const [drawerItems, setDrawerItems] = useState<DrawerFile[]>(() =>{
+        const fromStorage = getFromLocalStorage<DrawerFile>(DRAWER_ITEMS_KEY);
+        if (fromStorage.length === 0){
+            fromStorage.push({id: "root", title: "root", depth: -1, type: "folder"});
+        }
+        return fromStorage;
+    }
     );
     const [filesContents, setFilesContents] = useState<
         { id: string; content: string }[]
@@ -194,7 +182,7 @@ export function useFiles() {
     }, [drawerItems]);
 
     useEffect(() => {
-        localStorage.setItem(FILES_CONTENTS_KEY, JSON.stringify(filesContents));
+        saveToLocalStorage(FILES_CONTENTS_KEY, filesContents);
     }, [filesContents]);
 
     useEffect(()=>{

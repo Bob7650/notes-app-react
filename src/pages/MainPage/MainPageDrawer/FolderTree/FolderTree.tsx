@@ -48,9 +48,10 @@ export default function FolderTree({ onCallPopover }: Props) {
         let hiddenUntilDepth: number | null = null;
 
         for (const node of drawerItems) {
-            if (hiddenUntilDepth !== null && node.depth > hiddenUntilDepth) {
+            if (node.id === "root") continue;
+
+            if (hiddenUntilDepth !== null && node.depth > hiddenUntilDepth)
                 continue;
-            }
 
             hiddenUntilDepth = null;
             result.push(node);
@@ -67,6 +68,8 @@ export default function FolderTree({ onCallPopover }: Props) {
         setValidDrops([]);
         setHighlightedRange([]);
 
+        const activeItem = drawerItems.find((item) => item.id === e.active.id);
+        if (!activeItem) return;
         const overItem = drawerItems.find((item) => item.id === e.over?.id);
         if (!overItem) return;
 
@@ -75,10 +78,7 @@ export default function FolderTree({ onCallPopover }: Props) {
             parentFolder = getParentFolderOf(overItem, drawerItems);
         }
 
-        fileActions.dropFileToFolder(
-            e.active.id.toString(),
-            parentFolder?.id ?? overItem.id,
-        );
+        fileActions.dropFileToFolder(activeItem, parentFolder ?? overItem);
     };
 
     const handleDragOver = (e: DragOverEvent) => {
@@ -152,6 +152,9 @@ export default function FolderTree({ onCallPopover }: Props) {
                     )}
                 </div>
             ))}
+            {
+                // TODO: make this
+            }
             <DragOverlay>Hello</DragOverlay>
         </DndContext>
     );
