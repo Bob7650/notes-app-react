@@ -4,9 +4,6 @@ export function getFileSpan(
     file: DrawerFile,
     filesList: DrawerFile[],
 ): { startInd: number; endInd: number } {
-    // if (file.id === "root")
-    //     return { startInd: 0, endInd: filesList.length - 1 };
-
     if (file.type === "note") {
         const fileInd = filesList.indexOf(file);
         return { startInd: fileInd, endInd: fileInd };

@@ -7,10 +7,7 @@ import {
 } from "react";
 import type { DrawerFile } from "../types/DrawerFile";
 import { getFromLocalStorage, saveToLocalStorage } from "../utils/StorageUtils";
-import {
-    getFileSpan,
-    getValidDrops,
-} from "../utils/FolderTreeUtils";
+import { getFileSpan, getValidDrops } from "../utils/FolderTreeUtils";
 
 const DRAWER_ITEMS_KEY = "drawer_items";
 const FILES_CONTENTS_KEY = "files_contents";
@@ -72,12 +69,17 @@ const createFileActions = (
                     itemToRemove,
                     prevStateCopy,
                 );
-                setLastRemovedIds(prevStateCopy.splice(startInd, endInd - startInd + 1).map((item) => item.id));
+                setLastRemovedIds(
+                    prevStateCopy
+                        .splice(startInd, endInd - startInd + 1)
+                        .map((item) => item.id),
+                );
                 console.log(
                     `Removing from: ${startInd} amount: ${endInd - startInd + 1}`,
                 );
                 return prevStateCopy;
             }
+            setLastRemovedIds([id]);
             return prevState.filter((item) => item.id !== id);
         });
     },
@@ -128,9 +130,9 @@ const createFileActions = (
                 depth: item.depth - file.depth,
             }));
 
-            const adjustedSubtreeItems = normalizedSubtreeItems.map(item => ({
+            const adjustedSubtreeItems = normalizedSubtreeItems.map((item) => ({
                 ...item,
-                depth: item.depth + folder.depth + 1
+                depth: item.depth + folder.depth + 1,
             }));
 
             let insertInd = prevStateCopy.indexOf(folder);
@@ -138,10 +140,16 @@ const createFileActions = (
 
             if (file.type === "note") {
                 // TODO: change this to for loop with getFileSpan() for readablility
-                while (insertInd !== prevStateCopy.length &&
-                    prevStateCopy[insertInd].depth >= adjustedSubtreeItems[0].depth) {
-                    if (prevStateCopy[insertInd].type === "note" &&
-                    prevStateCopy[insertInd].depth === adjustedSubtreeItems[0].depth) {
+                while (
+                    insertInd !== prevStateCopy.length &&
+                    prevStateCopy[insertInd].depth >=
+                        adjustedSubtreeItems[0].depth
+                ) {
+                    if (
+                        prevStateCopy[insertInd].type === "note" &&
+                        prevStateCopy[insertInd].depth ===
+                            adjustedSubtreeItems[0].depth
+                    ) {
                         break;
                     } else {
                         ++insertInd;
@@ -163,14 +171,18 @@ const createFileActions = (
 });
 
 export function useFiles() {
-    const [drawerItems, setDrawerItems] = useState<DrawerFile[]>(() =>{
+    const [drawerItems, setDrawerItems] = useState<DrawerFile[]>(() => {
         const fromStorage = getFromLocalStorage<DrawerFile>(DRAWER_ITEMS_KEY);
-        if (fromStorage.length === 0){
-            fromStorage.push({id: "root", title: "root", depth: -1, type: "folder"});
+        if (fromStorage.length === 0) {
+            fromStorage.push({
+                id: "root",
+                title: "root",
+                depth: -1,
+                type: "folder",
+            });
         }
         return fromStorage;
-    }
-    );
+    });
     const [filesContents, setFilesContents] = useState<
         { id: string; content: string }[]
     >(getFromLocalStorage<{ id: string; content: string }>(FILES_CONTENTS_KEY));
@@ -185,8 +197,10 @@ export function useFiles() {
         saveToLocalStorage(FILES_CONTENTS_KEY, filesContents);
     }, [filesContents]);
 
-    useEffect(()=>{
-        setFilesContents((prevState) => prevState.filter((item) => !lastRemovedIds.includes(item.id)))
+    useEffect(() => {
+        setFilesContents((prevState) =>
+            prevState.filter((item) => !lastRemovedIds.includes(item.id)),
+        );
     }, [lastRemovedIds]);
 
     const fileActions = useMemo(
